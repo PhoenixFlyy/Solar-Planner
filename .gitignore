@@ -16,6 +16,9 @@ out/
 next-env.d.ts
 .vercel/
 
+# --- Cesium runtime assets (copied from node_modules by scripts/copy-cesium.mjs) ---
+apps/web/public/cesium/
+
 # --- Build output ---
 dist/
 build/

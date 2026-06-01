@@ -99,7 +99,9 @@
     "size": "Größe",
     "widthLabel": "Breite",
     "heightLabel": "Höhe",
-    "adjustRoof": "Dach anpassen"
+    "adjustRoof": "Dach anpassen",
+    "viewEditor": "3D-Editor",
+    "viewReal": "Realansicht"
   },
   "Wirtschaft": {
     "title": "Wirtschaftlichkeit",

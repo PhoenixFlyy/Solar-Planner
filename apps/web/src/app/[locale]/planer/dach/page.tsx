@@ -36,6 +36,16 @@ const RoofScene = dynamic(() => import("@/components/three/RoofScene").then((m) 
   loading: () => <div className="h-[28rem] w-full animate-pulse rounded-lg bg-neutral-100" />,
 });
 
+// Cesium real-world view (ADR-0008) — only used when a token is configured.
+const CesiumScene = dynamic(
+  () => import("@/components/three/CesiumScene").then((m) => m.CesiumScene),
+  {
+    ssr: false,
+    loading: () => <div className="h-[28rem] w-full animate-pulse rounded-lg bg-sky-100" />,
+  },
+);
+const CESIUM_TOKEN = process.env.NEXT_PUBLIC_CESIUM_ION_TOKEN;
+
 export default function DachPage() {
   const t = useTranslations("Dach");
 
@@ -61,6 +71,7 @@ export default function DachPage() {
   const toConfig = useRoofStore((s) => s.toConfig);
 
   const [armedKind, setArmedKind] = useState<ObstacleKind | null>(null);
+  const [view, setView] = useState<"editor" | "real">("editor");
 
   // Hydrate the editor once from Dexie (null = loaded-but-absent).
   const stored = useLiveQuery(() => db.projects.get(CURRENT_PROJECT_ID).then((p) => p ?? null), []);
@@ -199,20 +210,43 @@ export default function DachPage() {
       {geometry && params && (
         <div className="grid gap-6 lg:grid-cols-[1fr_18rem]">
           <div className="flex flex-col gap-3">
-            <RoofScene
-              geometry={geometry}
-              selectedSurfaceId={selectedSurfaceId}
-              onSelectSurface={handleSurfaceClick}
-              sun={sun}
-              panels={placements}
-              removedPanels={removedPanelIds}
-              onTogglePanel={togglePanel}
-              panelColorFor={panelColorFor}
-              obstacles={obstacles}
-              selectedObstacleId={selectedObstacleId}
-              onMoveObstacle={moveObstacle}
-              onSelectObstacle={selectObstacle}
-            />
+            {CESIUM_TOKEN && (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant={view === "editor" ? "default" : "outline"}
+                  onClick={() => setView("editor")}
+                >
+                  {t("viewEditor")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant={view === "real" ? "default" : "outline"}
+                  onClick={() => setView("real")}
+                >
+                  {t("viewReal")}
+                </Button>
+              </div>
+            )}
+
+            {view === "real" && CESIUM_TOKEN ? (
+              <CesiumScene lat={loc.lat} lng={loc.lng} token={CESIUM_TOKEN} />
+            ) : (
+              <RoofScene
+                geometry={geometry}
+                selectedSurfaceId={selectedSurfaceId}
+                onSelectSurface={handleSurfaceClick}
+                sun={sun}
+                panels={placements}
+                removedPanels={removedPanelIds}
+                onTogglePanel={togglePanel}
+                panelColorFor={panelColorFor}
+                obstacles={obstacles}
+                selectedObstacleId={selectedObstacleId}
+                onMoveObstacle={moveObstacle}
+                onSelectObstacle={selectObstacle}
+              />
+            )}
             <p className="text-sm text-neutral-600">
               {t("surfaceSummary", {
                 count: geometry.surfaces.length,

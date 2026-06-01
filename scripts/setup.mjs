@@ -35,6 +35,9 @@ async function main() {
   await run("pnpm", ["install"], { cwd: root });
   ok("JS dependencies installed.");
 
+  log("Copying Cesium runtime assets…");
+  await run("node", [p("scripts", "copy-cesium.mjs")], { cwd: root });
+
   if (hasUv) {
     log("Syncing Python environment (uv sync)…");
     await run("uv", ["sync"], { cwd: p("apps", "api") });

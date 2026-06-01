@@ -99,7 +99,9 @@
     "size": "Size",
     "widthLabel": "Width",
     "heightLabel": "Height",
-    "adjustRoof": "Adjust roof"
+    "adjustRoof": "Adjust roof",
+    "viewEditor": "3D editor",
+    "viewReal": "Real-world"
   },
   "Wirtschaft": {
     "title": "Economics",
