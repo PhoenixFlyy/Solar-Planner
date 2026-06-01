@@ -45,5 +45,14 @@
       "uv run --directory apps/api ruff check --fix",
       "uv run --directory apps/api ruff format"
     ]
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@swc/core",
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }

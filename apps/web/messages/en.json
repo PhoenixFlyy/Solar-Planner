@@ -1,0 +1,31 @@
+{
+  "Common": {
+    "appName": "Solar Planner",
+    "disclaimer": "Solar Planner is a planning companion, not a substitute for professional energy advice or a contractor quote."
+  },
+  "Landing": {
+    "title": "Plan your solar system — playfully.",
+    "subtitle": "From the first \"is it worth it for me?\" to a finished plan. Enter your address, see your house, plan, export — all in one tool.",
+    "cta": "Start Solar Planner",
+    "noLogin": "No login required. Your plan is saved on this device."
+  },
+  "ApiHealth": {
+    "title": "API status",
+    "checking": "Checking connection to the API …",
+    "ok": "API reachable",
+    "error": "API unreachable",
+    "service": "Service",
+    "version": "Version"
+  },
+  "Planer": {
+    "title": "Find your location",
+    "addressLabel": "Address",
+    "addressPlaceholder": "Street, number, city",
+    "search": "Search",
+    "searching": "Searching …",
+    "noResults": "No matches found.",
+    "footprintFound": "Building footprint found.",
+    "footprintMissing": "No building footprint found — you can enter free dimensions later.",
+    "restored": "Restored your last session."
+  }
+}
