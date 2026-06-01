@@ -95,7 +95,11 @@
     "heatmap": "Yield heatmap",
     "yieldLoading": "Calculating yield …",
     "annualYield": "≈ {kwh} kWh/year",
-    "continueToEconomics": "Next: economics"
+    "continueToEconomics": "Next: economics",
+    "size": "Size",
+    "widthLabel": "Width",
+    "heightLabel": "Height",
+    "adjustRoof": "Adjust roof"
   },
   "Wirtschaft": {
     "title": "Economics",

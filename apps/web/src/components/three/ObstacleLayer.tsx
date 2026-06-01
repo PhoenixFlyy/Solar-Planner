@@ -20,6 +20,7 @@ const KIND_COLOR: Record<Obstacle["kind"], string> = {
 };
 const SELECTED_COLOR = "#f59e0b";
 const SNAP = 0.5;
+const CHIMNEY_HEIGHT_M = 1.2;
 
 export interface ObstacleLayerProps {
   geometry: RoofGeometry;
@@ -90,31 +91,55 @@ export function ObstacleLayer({
     <group>
       {items.map((item) => {
         const { ob, basis } = item;
-        const thickness = ob.kind === "chimney" ? 0.8 : 0.12;
         const center = surfaceUVToWorld(basis, ob.u, ob.v);
+        const color = ob.id === selectedId ? SELECTED_COLOR : KIND_COLOR[ob.kind];
+
+        // Chimney: a real vertical stack rising from the roof (world-up box).
+        if (ob.kind === "chimney") {
+          const stack = CHIMNEY_HEIGHT_M;
+          return (
+            <mesh
+              key={ob.id}
+              position={[center[0], center[1] + stack / 2, center[2]]}
+              castShadow
+              receiveShadow
+              onPointerDown={(e) => startDrag(e, item)}
+            >
+              <boxGeometry args={[ob.widthM, stack, ob.heightM]} />
+              <meshStandardMaterial color={color} roughness={0.9} />
+            </mesh>
+          );
+        }
+
+        // Window / other: a thin panel lying flush in the roof plane.
+        const thickness = 0.12;
         const lift = thickness / 2 + 0.02;
-        const m = new THREE.Matrix4().makeBasis(
-          new THREE.Vector3(...basis.u),
-          new THREE.Vector3(...basis.n),
-          new THREE.Vector3(...basis.v),
+        const quaternion = new THREE.Quaternion().setFromRotationMatrix(
+          new THREE.Matrix4().makeBasis(
+            new THREE.Vector3(...basis.u),
+            new THREE.Vector3(...basis.n),
+            new THREE.Vector3(...basis.v),
+          ),
         );
-        const quaternion = new THREE.Quaternion().setFromRotationMatrix(m);
-        const position: [number, number, number] = [
-          center[0] + basis.n[0] * lift,
-          center[1] + basis.n[1] * lift,
-          center[2] + basis.n[2] * lift,
-        ];
-        const selected = ob.id === selectedId;
         return (
           <mesh
             key={ob.id}
-            position={position}
+            position={[
+              center[0] + basis.n[0] * lift,
+              center[1] + basis.n[1] * lift,
+              center[2] + basis.n[2] * lift,
+            ]}
             quaternion={quaternion}
             castShadow
+            receiveShadow
             onPointerDown={(e) => startDrag(e, item)}
           >
             <boxGeometry args={[ob.widthM, thickness, ob.heightM]} />
-            <meshStandardMaterial color={selected ? SELECTED_COLOR : KIND_COLOR[ob.kind]} />
+            <meshStandardMaterial
+              color={color}
+              roughness={ob.kind === "window" ? 0.1 : 0.7}
+              metalness={ob.kind === "window" ? 0.6 : 0}
+            />
           </mesh>
         );
       })}

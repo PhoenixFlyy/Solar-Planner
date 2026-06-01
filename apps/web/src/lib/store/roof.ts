@@ -28,6 +28,7 @@ interface RoofState {
   togglePanel: (id: string) => void;
   addObstacle: (kind: ObstacleKind, surfaceId: string, u: number, v: number) => void;
   moveObstacle: (id: string, u: number, v: number) => void;
+  resizeObstacle: (id: string, widthM: number, heightM: number) => void;
   removeObstacle: (id: string) => void;
   selectObstacle: (id: string | null) => void;
   hydrate: (config: RoofConfig | null) => void;
@@ -86,6 +87,11 @@ export const useRoofStore = create<RoofState>((set, get) => ({
   moveObstacle: (id, u, v) =>
     set((s) => ({
       obstacles: s.obstacles.map((ob) => (ob.id === id ? { ...ob, u, v } : ob)),
+    })),
+
+  resizeObstacle: (id, widthM, heightM) =>
+    set((s) => ({
+      obstacles: s.obstacles.map((ob) => (ob.id === id ? { ...ob, widthM, heightM } : ob)),
     })),
 
   removeObstacle: (id) =>

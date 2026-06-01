@@ -54,6 +54,7 @@ export default function DachPage() {
   const selectedObstacleId = useRoofStore((s) => s.selectedObstacleId);
   const addObstacle = useRoofStore((s) => s.addObstacle);
   const moveObstacle = useRoofStore((s) => s.moveObstacle);
+  const resizeObstacle = useRoofStore((s) => s.resizeObstacle);
   const removeObstacle = useRoofStore((s) => s.removeObstacle);
   const selectObstacle = useRoofStore((s) => s.selectObstacle);
   const hydrate = useRoofStore((s) => s.hydrate);
@@ -173,6 +174,8 @@ export default function DachPage() {
     if (dims) setParams(applyDimensions(params, dims));
   }
 
+  const selectedObstacle = obstacles.find((o) => o.id === selectedObstacleId) ?? null;
+
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-12">
       <div className="flex items-start justify-between gap-4">
@@ -246,6 +249,25 @@ export default function DachPage() {
             </div>
             <p className="text-xs text-neutral-400">{armedKind ? t("placeHint") : t("dragHint")}</p>
 
+            {/* Custom size for the selected obstacle */}
+            {selectedObstacle && (
+              <div className="flex flex-col gap-2 rounded-lg border border-neutral-200 p-3">
+                <span className="text-sm font-medium text-neutral-700">
+                  {t(selectedObstacle.kind)} — {t("size")}
+                </span>
+                <SizeRow
+                  label={t("widthLabel")}
+                  value={selectedObstacle.widthM}
+                  onChange={(w) => resizeObstacle(selectedObstacle.id, w, selectedObstacle.heightM)}
+                />
+                <SizeRow
+                  label={t("heightLabel")}
+                  value={selectedObstacle.heightM}
+                  onChange={(h) => resizeObstacle(selectedObstacle.id, selectedObstacle.widthM, h)}
+                />
+              </div>
+            )}
+
             <SunControls value={sunTime} onChange={setSunTime} />
           </div>
 
@@ -299,7 +321,10 @@ export default function DachPage() {
                 />
               </div>
 
-              <RoofParamSliders params={params} onChange={setParam} />
+              <div className="flex flex-col gap-2 border-t border-neutral-200 pt-3">
+                <span className="text-sm font-medium text-neutral-700">{t("adjustRoof")}</span>
+                <RoofParamSliders params={params} onChange={setParam} />
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -311,5 +336,25 @@ export default function DachPage() {
         </Button>
       )}
     </main>
+  );
+}
+
+function SizeRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-neutral-600">{label}</span>
+        <span className="font-mono text-neutral-500">{value.toFixed(1)} m</span>
+      </div>
+      <Slider min={0.4} max={3} step={0.1} value={[value]} onValueChange={([v]) => onChange(v)} />
+    </div>
   );
 }

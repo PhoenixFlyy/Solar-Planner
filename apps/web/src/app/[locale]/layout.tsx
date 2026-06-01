@@ -8,6 +8,7 @@ import { routing } from "@/i18n/routing";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ConsentBanner } from "@/components/ConsentBanner";
+import { GlobalLoadingBar } from "@/components/GlobalLoadingBar";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default async function LocaleLayout({
       <body className="min-h-screen antialiased">
         <NextIntlClientProvider messages={messages}>
           <QueryProvider>
+            <GlobalLoadingBar />
             <div className="flex min-h-screen flex-col">
               <div className="flex-1">{children}</div>
               <SiteFooter />

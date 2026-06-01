@@ -95,7 +95,11 @@
     "heatmap": "Ertrags-Heatmap",
     "yieldLoading": "Ertrag wird berechnet …",
     "annualYield": "≈ {kwh} kWh/Jahr",
-    "continueToEconomics": "Weiter: Wirtschaftlichkeit"
+    "continueToEconomics": "Weiter: Wirtschaftlichkeit",
+    "size": "Größe",
+    "widthLabel": "Breite",
+    "heightLabel": "Höhe",
+    "adjustRoof": "Dach anpassen"
   },
   "Wirtschaft": {
     "title": "Wirtschaftlichkeit",
