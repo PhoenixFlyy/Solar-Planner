@@ -19,6 +19,8 @@ export interface EconomicsInputs {
   years?: number;
   priceInflation?: number; // electricity price growth per year
   degradation?: number; // PV output loss per year
+  /** If set (e.g. from the hourly simulation), overrides the heuristic. */
+  selfConsumptionOverrideKwh?: number;
 }
 
 export interface CashflowPoint {
@@ -60,17 +62,22 @@ export function computeEconomics(inputs: EconomicsInputs): EconomicsResult {
   const demand = Math.max(0, o.annualDemandKwh);
   const production = Math.max(0, o.annualProductionKwh);
 
-  // Direct self-use without storage, then the storage contribution (capped by
-  // what's left of both demand and surplus, and by annual cycling capacity).
-  const directSelfUse = Math.min(demand, production * BASE_DIRECT_SELF_USE);
-  const remainingSurplus = Math.max(0, production - directSelfUse);
-  const remainingDemand = Math.max(0, demand - directSelfUse);
-  const storageShift = Math.min(
-    o.storageKwh * STORAGE_CYCLES_PER_YEAR,
-    remainingSurplus,
-    remainingDemand,
-  );
-  const selfConsumptionKwh = directSelfUse + storageShift;
+  // Prefer an externally-simulated self-consumption (hourly sim); else fall
+  // back to the heuristic: direct self-use + a storage contribution.
+  let selfConsumptionKwh: number;
+  if (o.selfConsumptionOverrideKwh !== undefined) {
+    selfConsumptionKwh = Math.max(0, Math.min(o.selfConsumptionOverrideKwh, demand, production));
+  } else {
+    const directSelfUse = Math.min(demand, production * BASE_DIRECT_SELF_USE);
+    const remainingSurplus = Math.max(0, production - directSelfUse);
+    const remainingDemand = Math.max(0, demand - directSelfUse);
+    const storageShift = Math.min(
+      o.storageKwh * STORAGE_CYCLES_PER_YEAR,
+      remainingSurplus,
+      remainingDemand,
+    );
+    selfConsumptionKwh = directSelfUse + storageShift;
+  }
   const feedInKwh = Math.max(0, production - selfConsumptionKwh);
   const gridImportKwh = Math.max(0, demand - selfConsumptionKwh);
 

@@ -10,8 +10,9 @@ import { useRoofStore } from "@/lib/store/roof";
 import { getTemplate } from "@/lib/templates";
 import { layoutGeometry, PANEL } from "@/lib/solar/panel-layout";
 import { fetchSystemYield } from "@/lib/api/solar";
-import { estimateAnnualDemand } from "@/lib/economics/consumption";
+import { demandComponents, estimateAnnualDemand } from "@/lib/economics/consumption";
 import { computeEconomics } from "@/lib/economics/model";
+import { simulateYear } from "@/lib/simulation/simulate";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -105,6 +106,18 @@ export default function WirtschaftPage() {
 
   const demandKwh = estimateAnnualDemand(econ);
 
+  // Hourly simulation drives self-consumption / autarky (Phase 2).
+  const sim = useMemo(() => {
+    if (!yieldQuery.data) return null;
+    return simulateYear({
+      monthlyPvKwh: yieldQuery.data.monthly_kwh,
+      demand: demandComponents(econ),
+      storageKwh: econ.storageKwh,
+      lat: loc.lat,
+      lng: loc.lng,
+    });
+  }, [yieldQuery.data, econ, loc.lat, loc.lng]);
+
   const economics = useMemo(() => {
     if (!yieldQuery.data) return null;
     return computeEconomics({
@@ -113,8 +126,9 @@ export default function WirtschaftPage() {
       monthlyProductionKwh: yieldQuery.data.monthly_kwh,
       kWp,
       storageKwh: econ.storageKwh,
+      selfConsumptionOverrideKwh: sim?.selfConsumptionKwh,
     });
-  }, [yieldQuery.data, demandKwh, kWp, econ.storageKwh]);
+  }, [yieldQuery.data, demandKwh, kWp, econ.storageKwh, sim]);
 
   if (roofHydrated.current && !templateId) {
     return (
