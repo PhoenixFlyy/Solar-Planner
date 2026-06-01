@@ -1,0 +1,5 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+# apps/api is a Python project managed by uv: it has no package.json, so pnpm
+# ignores it. It is driven by the same root scripts (dev:api, test:api, ...).

@@ -1,0 +1,49 @@
+{
+  "name": "solar-planner",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "All-in-one PV planning web app for German homeowners (monorepo root).",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "uv run --directory apps/api uvicorn solar_api.main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:infra": "docker compose -f infra/docker-compose.yml up",
+    "dev:infra:down": "docker compose -f infra/docker-compose.yml down",
+    "codegen": "node scripts/codegen.mjs",
+    "test": "pnpm run test:web && pnpm run test:api",
+    "test:web": "pnpm --filter web test",
+    "test:api": "uv run --directory apps/api pytest",
+    "test:e2e": "pnpm --filter web test:e2e",
+    "lint": "pnpm run lint:web && pnpm run lint:api",
+    "lint:web": "pnpm --filter web lint",
+    "lint:api": "uv run --directory apps/api ruff check .",
+    "typecheck": "pnpm run typecheck:web && pnpm run typecheck:api",
+    "typecheck:web": "pnpm --filter web typecheck",
+    "typecheck:api": "uv run --directory apps/api mypy .",
+    "format": "prettier --write . && uv run --directory apps/api ruff format .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "openapi-typescript": "^7.9.1",
+    "prettier": "^3.6.2"
+  },
+  "lint-staged": {
+    "apps/web/**/*.{ts,tsx,js,jsx,json,css,md}": [
+      "prettier --write"
+    ],
+    "apps/api/**/*.py": [
+      "uv run --directory apps/api ruff check --fix",
+      "uv run --directory apps/api ruff format"
+    ]
+  }
+}

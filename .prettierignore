@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+pnpm-lock.yaml
+# Generated — never hand-format
+packages/shared-types/src/api.ts
+packages/shared-types/openapi.json
+# Python is handled by ruff, not prettier
+apps/api/
+.venv/
