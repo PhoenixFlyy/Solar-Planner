@@ -32,3 +32,5 @@ or goes stale within a sprint belongs in a code comment or a PR, not here
 - [ops/setup.md](./ops/setup.md) — local environment setup.
 - [ops/contributing.md](./ops/contributing.md) — workflow conventions.
 - [ops/testing.md](./ops/testing.md) — how to run and write tests.
+- [ops/manual-testing.md](./ops/manual-testing.md) — run locally + manual click-through.
+- Recaps: [sprint-0](./ops/sprint-0-recap.md) · [sprint-1](./ops/sprint-1-recap.md) · [phase-2](./ops/phase-2-recap.md).
