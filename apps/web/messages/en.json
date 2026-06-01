@@ -3,6 +3,38 @@
     "appName": "Solar Planner",
     "disclaimer": "Solar Planner is a planning companion, not a substitute for professional energy advice or a contractor quote."
   },
+  "Footer": {
+    "disclaimer": "Estimates without warranty. Solar Planner is not energy advice, a structural assessment, or a contractor quote.",
+    "impressum": "Imprint",
+    "datenschutz": "Privacy"
+  },
+  "Consent": {
+    "text": "This app stores your plan locally on your device (IndexedDB). No tracking. Addresses are sent only to OpenStreetMap/PVGIS for calculations, not stored.",
+    "more": "Learn more",
+    "accept": "Got it"
+  },
+  "Impressum": {
+    "title": "Imprint",
+    "intro": "Information pursuant to § 5 DDG (German law).",
+    "providerHeading": "Provider",
+    "providerPlaceholder": "[TODO: name / company]\n[TODO: street, number]\n[TODO: postcode, city]",
+    "contactHeading": "Contact",
+    "contactPlaceholder": "[TODO: email]\n[TODO: phone (optional)]",
+    "todo": "Note: placeholder. Fill with real details and have it legally reviewed before launch."
+  },
+  "Datenschutz": {
+    "title": "Privacy Policy",
+    "intro": "This app is local-first. How we handle data:",
+    "localHeading": "Local storage",
+    "localText": "Your project (location, roof, modules, consumption) is stored only locally in your browser (IndexedDB). It leaves your device only if you export it or create an account.",
+    "externalHeading": "External services",
+    "externalText": "For calculations, requests go to Photon/OpenStreetMap (geocoding, footprint) and PVGIS (yield). Addresses are transmitted for this but not stored permanently. The map loads tiles from OpenStreetMap.",
+    "analyticsHeading": "Tracking / cookies",
+    "analyticsText": "No tracking, no ads, no analytics cookies in the MVP. Only a local notice-acknowledged flag is stored in the browser.",
+    "rightsHeading": "Your rights",
+    "rightsText": "Since no personal data is stored server-side, you can delete your data anytime via the app (clear browser data).",
+    "todo": "Note: placeholder. Have it legally reviewed before launch and extend when account/analytics are enabled."
+  },
   "Landing": {
     "title": "Plan your solar system — playfully.",
     "subtitle": "From the first \"is it worth it for me?\" to a finished plan. Enter your address, see your house, plan, export — all in one tool.",

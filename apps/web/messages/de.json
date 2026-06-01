@@ -3,6 +3,38 @@
     "appName": "Solar Planner",
     "disclaimer": "Solar Planner ist ein Planungs-Begleiter, kein Ersatz für eine Energieberatung oder ein Fachangebot."
   },
+  "Footer": {
+    "disclaimer": "Schätzwerte ohne Gewähr. Solar Planner ersetzt keine Energieberatung, keine Statikprüfung und kein Fachangebot.",
+    "impressum": "Impressum",
+    "datenschutz": "Datenschutz"
+  },
+  "Consent": {
+    "text": "Diese App speichert deinen Plan lokal auf deinem Gerät (IndexedDB). Kein Tracking. Adressen werden nur zur Berechnung an OpenStreetMap/PVGIS gesendet, nicht gespeichert.",
+    "more": "Mehr erfahren",
+    "accept": "Verstanden"
+  },
+  "Impressum": {
+    "title": "Impressum",
+    "intro": "Angaben gemäß § 5 DDG.",
+    "providerHeading": "Diensteanbieter",
+    "providerPlaceholder": "[TODO: Name / Firma]\n[TODO: Straße, Hausnummer]\n[TODO: PLZ, Ort]",
+    "contactHeading": "Kontakt",
+    "contactPlaceholder": "[TODO: E-Mail]\n[TODO: Telefon (optional)]",
+    "todo": "Hinweis: Platzhalter. Vor Veröffentlichung mit echten Angaben füllen und rechtlich prüfen lassen."
+  },
+  "Datenschutz": {
+    "title": "Datenschutzerklärung",
+    "intro": "Diese App ist local-first aufgebaut. So gehen wir mit Daten um:",
+    "localHeading": "Lokale Speicherung",
+    "localText": "Dein Projekt (Standort, Dach, Module, Verbrauch) wird ausschließlich lokal in deinem Browser (IndexedDB) gespeichert. Es verlässt dein Gerät nur, wenn du es exportierst oder einen Account anlegst.",
+    "externalHeading": "Externe Dienste",
+    "externalText": "Zur Berechnung werden Anfragen an Photon/OpenStreetMap (Geokodierung, Gebäudeumriss) und PVGIS (Ertrag) gesendet. Adressen werden dafür übertragen, aber nicht dauerhaft gespeichert. Die Karte lädt Kacheln von OpenStreetMap.",
+    "analyticsHeading": "Tracking / Cookies",
+    "analyticsText": "Kein Tracking, keine Werbung, keine Analyse-Cookies im MVP. Es wird nur ein lokaler Hinweis-Status (Cookie-Banner) im Browser gespeichert.",
+    "rightsHeading": "Deine Rechte",
+    "rightsText": "Da keine personenbezogenen Daten serverseitig gespeichert werden, kannst du deine Daten jederzeit selbst über die App-Funktionen löschen (Browser-Daten leeren).",
+    "todo": "Hinweis: Platzhalter. Vor Veröffentlichung rechtlich prüfen lassen und bei Aktivierung von Account/Analytics ergänzen."
+  },
   "Landing": {
     "title": "Plane deine Solaranlage – spielerisch.",
     "subtitle": "Vom ersten \"Lohnt sich das bei mir?\" bis zum fertigen Plan. Adresse eingeben, Haus sehen, planen, exportieren – alles in einem Werkzeug.",

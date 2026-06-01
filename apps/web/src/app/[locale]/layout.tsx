@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 
 import { routing } from "@/i18n/routing";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { SiteFooter } from "@/components/SiteFooter";
+import { ConsentBanner } from "@/components/ConsentBanner";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -35,7 +37,13 @@ export default async function LocaleLayout({
     <html lang={locale}>
       <body className="min-h-screen antialiased">
         <NextIntlClientProvider messages={messages}>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <div className="flex min-h-screen flex-col">
+              <div className="flex-1">{children}</div>
+              <SiteFooter />
+            </div>
+            <ConsentBanner />
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
