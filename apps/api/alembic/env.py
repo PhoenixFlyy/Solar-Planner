@@ -6,14 +6,12 @@ from __future__ import annotations
 
 from logging.config import fileConfig
 
-from alembic import context
-from sqlalchemy import engine_from_config, pool
-from sqlmodel import SQLModel
-
-from solar_api.core.config import get_settings
-
 # Import models so they register on SQLModel.metadata before autogenerate.
 import solar_api.db.models  # noqa: F401
+from alembic import context
+from solar_api.core.config import get_settings
+from sqlalchemy import engine_from_config, pool
+from sqlmodel import SQLModel
 
 config = context.config
 if config.config_file_name is not None:
