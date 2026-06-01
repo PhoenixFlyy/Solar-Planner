@@ -6,7 +6,11 @@ import { Grid, OrbitControls } from "@react-three/drei";
 
 import type { RoofGeometry } from "@/lib/templates";
 import { sunDirection, type SunPosition } from "@/lib/solar/sun-position";
+import type { PanelPlacement } from "@/lib/solar/panel-layout";
 import { RoofMesh } from "./RoofMesh";
+import { PanelLayer } from "./PanelLayer";
+
+const EMPTY: Set<string> = new Set();
 
 export interface RoofSceneProps {
   geometry: RoofGeometry;
@@ -14,6 +18,9 @@ export interface RoofSceneProps {
   onSelectSurface?: (id: string) => void;
   /** Sun position for the directional light; omitted = a fixed default sun. */
   sun?: SunPosition;
+  panels?: PanelPlacement[];
+  removedPanels?: Set<string>;
+  onTogglePanel?: (id: string) => void;
   className?: string;
 }
 
@@ -26,6 +33,9 @@ export function RoofScene({
   selectedSurfaceId,
   onSelectSurface,
   sun,
+  panels,
+  removedPanels,
+  onTogglePanel,
   className,
 }: RoofSceneProps) {
   const target: [number, number, number] = [0, geometry.ridgeHeightM / 2, 0];
@@ -74,6 +84,14 @@ export function RoofScene({
           selectedSurfaceId={selectedSurfaceId}
           onSelectSurface={onSelectSurface}
         />
+
+        {panels && panels.length > 0 && (
+          <PanelLayer
+            placements={panels}
+            removed={removedPanels ?? EMPTY}
+            onTogglePanel={onTogglePanel}
+          />
+        )}
 
         {/* Ground */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>

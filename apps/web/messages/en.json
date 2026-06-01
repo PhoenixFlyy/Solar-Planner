@@ -34,7 +34,11 @@
     "subtitle": "Pick a roof template and adjust the dimensions. The 3D house reacts instantly.",
     "surfaceSummary": "{count} roof faces · {area} m² roof area",
     "useFootprint": "Use building dimensions",
-    "back": "Back"
+    "back": "Back",
+    "modules": "Modules",
+    "kwp": "{kwp} kWp",
+    "density": "Packing density",
+    "removeHint": "Click a module to remove it."
   },
   "Sun": {
     "time": "Time of day",

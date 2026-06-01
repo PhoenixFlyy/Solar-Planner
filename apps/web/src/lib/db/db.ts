@@ -20,6 +20,10 @@ export interface StoredLocation {
 export interface RoofConfig {
   templateId: RoofTemplateId;
   params: RoofParams;
+  /** Panel auto-layout density, 0..1. */
+  panelDensity?: number;
+  /** Panel ids the user manually removed from the auto-layout. */
+  removedPanelIds?: string[];
 }
 
 export interface PlannerProject {

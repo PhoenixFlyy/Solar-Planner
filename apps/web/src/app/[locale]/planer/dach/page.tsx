@@ -9,12 +9,14 @@ import { CURRENT_PROJECT_ID, db, saveProject } from "@/lib/db/db";
 import { useRoofStore } from "@/lib/store/roof";
 import { applyDimensions, footprintDimensions, getTemplate } from "@/lib/templates";
 import { sunPosition } from "@/lib/solar/sun-position";
+import { kWpFor, layoutGeometry } from "@/lib/solar/panel-layout";
 import { Link } from "@/i18n/navigation";
 import { TemplatePicker } from "@/components/planner/TemplatePicker";
 import { RoofParamSliders } from "@/components/planner/RoofParamSliders";
 import { SunControls, type SunTime } from "@/components/planner/SunControls";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
 
 // Berlin fallback when no location has been chosen yet.
 const DEFAULT_LOCATION = { lat: 52.52, lng: 13.405 };
@@ -35,7 +37,12 @@ export default function DachPage() {
   const setParam = useRoofStore((s) => s.setParam);
   const setParams = useRoofStore((s) => s.setParams);
   const selectSurface = useRoofStore((s) => s.selectSurface);
+  const panelDensity = useRoofStore((s) => s.panelDensity);
+  const removedPanelIds = useRoofStore((s) => s.removedPanelIds);
+  const setPanelDensity = useRoofStore((s) => s.setPanelDensity);
+  const togglePanel = useRoofStore((s) => s.togglePanel);
   const hydrate = useRoofStore((s) => s.hydrate);
+  const toConfig = useRoofStore((s) => s.toConfig);
 
   // Hydrate the editor once from Dexie (null = loaded-but-absent).
   const stored = useLiveQuery(() => db.projects.get(CURRENT_PROJECT_ID).then((p) => p ?? null), []);
@@ -50,9 +57,10 @@ export default function DachPage() {
   // Persist roof config on change (after hydration).
   useEffect(() => {
     if (hydrated.current && templateId && params) {
-      void saveProject({ roof: { templateId, params } });
+      const roof = toConfig();
+      if (roof) void saveProject({ roof });
     }
-  }, [templateId, params]);
+  }, [templateId, params, panelDensity, removedPanelIds, toConfig]);
 
   const geometry = useMemo(
     () => (templateId && params ? getTemplate(templateId).buildGeometry(params) : null),
@@ -60,6 +68,14 @@ export default function DachPage() {
   );
 
   const totalAreaM2 = geometry ? geometry.surfaces.reduce((a, s) => a + s.areaM2, 0) : 0;
+
+  // Auto-layout panels; count excludes manually-removed ones.
+  const placements = useMemo(
+    () => (geometry ? layoutGeometry(geometry, { density: panelDensity }) : []),
+    [geometry, panelDensity],
+  );
+  const panelCount = placements.filter((p) => !removedPanelIds.has(p.id)).length;
+  const kWp = kWpFor(panelCount);
 
   // Sun / time-of-year for the live light + shadows.
   const [sunTime, setSunTime] = useState<SunTime>({ month: 6, day: 21, hour: 12 });
@@ -105,6 +121,9 @@ export default function DachPage() {
               selectedSurfaceId={selectedSurfaceId}
               onSelectSurface={selectSurface}
               sun={sun}
+              panels={placements}
+              removedPanels={removedPanelIds}
+              onTogglePanel={togglePanel}
             />
             <p className="text-sm text-neutral-600">
               {t("surfaceSummary", {
@@ -116,7 +135,35 @@ export default function DachPage() {
           </div>
 
           <Card className="h-fit">
-            <CardContent className="p-4">
+            <CardContent className="flex flex-col gap-5 p-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-neutral-500">{t("modules")}</span>
+                <span className="text-2xl font-bold">{panelCount}</span>
+                <span className="text-sm text-neutral-500">
+                  {t("kwp", { kwp: kWp.toFixed(1) })}
+                </span>
+                <p className="text-xs text-neutral-400">{t("removeHint")}</p>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between text-sm">
+                  <label htmlFor="panel-density" className="text-neutral-700">
+                    {t("density")}
+                  </label>
+                  <span className="font-mono text-neutral-500">
+                    {Math.round(panelDensity * 100)}%
+                  </span>
+                </div>
+                <Slider
+                  id="panel-density"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={[panelDensity]}
+                  onValueChange={([d]) => setPanelDensity(d)}
+                />
+              </div>
+
               <RoofParamSliders params={params} onChange={setParam} />
             </CardContent>
           </Card>

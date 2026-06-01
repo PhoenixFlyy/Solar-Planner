@@ -34,7 +34,11 @@
     "subtitle": "Wähle ein Dach-Template und passe die Maße an. Das 3D-Haus reagiert sofort.",
     "surfaceSummary": "{count} Dachflächen · {area} m² Dachfläche",
     "useFootprint": "Maße aus Gebäude übernehmen",
-    "back": "Zurück"
+    "back": "Zurück",
+    "modules": "Module",
+    "kwp": "{kwp} kWp",
+    "density": "Belegungsdichte",
+    "removeHint": "Modul anklicken zum Entfernen."
   },
   "Sun": {
     "time": "Uhrzeit",

@@ -11,6 +11,11 @@ test("dach_selectTemplate_buildsGeometryAndPersists", async ({ page }) => {
   // Gable has two roof faces.
   await expect(page.getByText(/2 Dachflächen/)).toBeVisible();
 
+  // Module auto-layout produced a positive count + kWp.
+  await expect(page.getByText("Module", { exact: true })).toBeVisible();
+  await expect(page.getByText(/kWp/)).toBeVisible();
+
   await page.reload();
   await expect(page.getByText(/2 Dachflächen/)).toBeVisible();
+  await expect(page.getByText("Module", { exact: true })).toBeVisible();
 });
