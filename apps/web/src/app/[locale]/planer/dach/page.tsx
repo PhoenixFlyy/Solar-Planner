@@ -304,6 +304,12 @@ export default function DachPage() {
           </Card>
         </div>
       )}
+
+      {geometry && (
+        <Button asChild className="self-start">
+          <Link href="/planer/wirtschaft">{t("continueToEconomics")}</Link>
+        </Button>
+      )}
     </main>
   );
 }

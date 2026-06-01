@@ -29,6 +29,14 @@ export interface RoofConfig {
   obstacles?: Obstacle[];
 }
 
+/** Consumption + storage inputs for the economics step. */
+export interface EconomicsConfig {
+  persons: number;
+  eCar: boolean;
+  heatPump: boolean;
+  storageKwh: number;
+}
+
 export interface PlannerProject {
   /** Single current project in MVP (multi-project is Phase 2). */
   id: string;
@@ -36,6 +44,7 @@ export interface PlannerProject {
   location: StoredLocation | null;
   footprint: { points: StoredLatLng[] } | null;
   roof: RoofConfig | null;
+  economics: EconomicsConfig | null;
   updatedAt: number;
 }
 
@@ -64,6 +73,7 @@ export async function saveProject(patch: Partial<Omit<PlannerProject, "id" | "up
     location: null,
     footprint: null,
     roof: null,
+    economics: null,
     ...existing,
     ...patch,
     updatedAt: Date.now(),
