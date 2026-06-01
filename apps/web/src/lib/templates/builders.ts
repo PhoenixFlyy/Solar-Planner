@@ -15,19 +15,24 @@ import type {
 
 type LocalSurface = Omit<RoofSurface, "azimuthDeg"> & { localAzimuthDeg: number };
 
-/** Rotate every polygon + shift every azimuth so the front faces `azimuthDeg`. */
+/** Rotate polygons + shift azimuths so the front faces `azimuthDeg`. */
 function orient(
   local: LocalSurface[],
   ground: Vec3[],
+  gableFaces: Vec3[][],
   frontAzimuthDeg: number,
-): { surfaces: RoofSurface[]; groundPolygon: Vec3[] } {
+): Pick<RoofGeometry, "surfaces" | "groundPolygon" | "gableFaces"> {
   const delta = frontAzimuthDeg - 180; // local front faces south (180)
   const surfaces = local.map(({ localAzimuthDeg, polygon, ...rest }) => ({
     ...rest,
     azimuthDeg: norm360(localAzimuthDeg + delta),
     polygon: polygon.map((p) => rotateY(p, delta)),
   }));
-  return { surfaces, groundPolygon: ground.map((p) => rotateY(p, delta)) };
+  return {
+    surfaces,
+    groundPolygon: ground.map((p) => rotateY(p, delta)),
+    gableFaces: gableFaces.map((face) => face.map((p) => rotateY(p, delta))),
+  };
 }
 
 function rect(hw: number, hd: number): Vec3[] {
@@ -76,15 +81,27 @@ export function buildGable(p: GableParams, templateId: RoofTemplateId): RoofGeom
     },
   ];
 
-  const { surfaces, groundPolygon } = orient(local, rect(hw, hs), p.azimuthDeg);
+  // Gable-end triangles at x = ±hw, between eave and ridge.
+  const gableFaces: Vec3[][] = [
+    [
+      [hw, p.eaveHeightM, -hs],
+      [hw, p.eaveHeightM, hs],
+      [hw, p.ridgeHeightM, 0],
+    ],
+    [
+      [-hw, p.eaveHeightM, -hs],
+      [-hw, p.eaveHeightM, hs],
+      [-hw, p.ridgeHeightM, 0],
+    ],
+  ];
+
   return {
     templateId,
     footprintWidthM: p.lengthM,
     footprintDepthM: p.spanM,
     eaveHeightM: p.eaveHeightM,
     ridgeHeightM: p.ridgeHeightM,
-    surfaces,
-    groundPolygon,
+    ...orient(local, rect(hw, hs), gableFaces, p.azimuthDeg),
   };
 }
 
@@ -95,6 +112,8 @@ export function buildMono(p: MonoParams, templateId: RoofTemplateId = "pultdach"
   const area = slant(run, rise) * p.lengthM;
   const hw = p.lengthM / 2; // E-W along X
   const hd = p.widthM / 2; // N-S along Z (low eave south, high eave north)
+  const lo = p.lowEaveHeightM;
+  const hi = p.highEaveHeightM;
 
   const local: LocalSurface[] = [
     {
@@ -104,23 +123,41 @@ export function buildMono(p: MonoParams, templateId: RoofTemplateId = "pultdach"
       tiltDeg: t,
       areaM2: area,
       polygon: [
-        [-hw, p.lowEaveHeightM, -hd],
-        [hw, p.lowEaveHeightM, -hd],
-        [hw, p.highEaveHeightM, hd],
-        [-hw, p.highEaveHeightM, hd],
+        [-hw, lo, -hd],
+        [hw, lo, -hd],
+        [hw, hi, hd],
+        [-hw, hi, hd],
       ],
     },
   ];
 
-  const { surfaces, groundPolygon } = orient(local, rect(hw, hd), p.azimuthDeg);
+  // East/west side triangles (low->high) + the north high-side rectangle.
+  const gableFaces: Vec3[][] = [
+    [
+      [hw, lo, -hd],
+      [hw, lo, hd],
+      [hw, hi, hd],
+    ],
+    [
+      [-hw, lo, -hd],
+      [-hw, lo, hd],
+      [-hw, hi, hd],
+    ],
+    [
+      [-hw, lo, hd],
+      [hw, lo, hd],
+      [hw, hi, hd],
+      [-hw, hi, hd],
+    ],
+  ];
+
   return {
     templateId,
     footprintWidthM: p.lengthM,
     footprintDepthM: p.widthM,
-    eaveHeightM: p.lowEaveHeightM,
-    ridgeHeightM: p.highEaveHeightM,
-    surfaces,
-    groundPolygon,
+    eaveHeightM: lo,
+    ridgeHeightM: hi,
+    ...orient(local, rect(hw, hd), gableFaces, p.azimuthDeg),
   };
 }
 
@@ -195,15 +232,14 @@ export function buildHip(p: HipParams, templateId: RoofTemplateId = "walmdach"):
     },
   ];
 
-  const { surfaces, groundPolygon } = orient(local, rect(hw, hs), p.azimuthDeg);
+  // Hip roofs reach the eave on all sides — the eave-height box fully closes it.
   return {
     templateId,
     footprintWidthM: p.lengthM,
     footprintDepthM: p.spanM,
     eaveHeightM: p.eaveHeightM,
     ridgeHeightM: p.ridgeHeightM,
-    surfaces,
-    groundPolygon,
+    ...orient(local, rect(hw, hs), [], p.azimuthDeg),
   };
 }
 
@@ -236,5 +272,6 @@ export function buildFlat(p: FlatParams, templateId: RoofTemplateId = "flachdach
     ridgeHeightM: p.roofHeightM + p.parapetHeightM,
     surfaces,
     groundPolygon: rect(hw, hd),
+    gableFaces: [],
   };
 }

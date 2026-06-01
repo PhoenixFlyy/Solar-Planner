@@ -27,5 +27,30 @@
     "footprintFound": "Gebäudeumriss gefunden.",
     "footprintMissing": "Kein Gebäudeumriss gefunden – du kannst später freie Maße eingeben.",
     "restored": "Letzter Stand wiederhergestellt."
+  },
+  "Dach": {
+    "title": "Dachform wählen",
+    "subtitle": "Wähle ein Dach-Template und passe die Maße an. Das 3D-Haus reagiert sofort.",
+    "surfaceSummary": "{count} Dachflächen · {area} m² Dachfläche"
+  },
+  "RoofTemplates": {
+    "satteldach": "Satteldach",
+    "pultdach": "Pultdach",
+    "walmdach": "Walmdach",
+    "flachdach": "Flachdach",
+    "reihenhaus-sattel": "Reihenhaus-Sattel"
+  },
+  "RoofParams": {
+    "spanM": "Spannweite",
+    "lengthM": "Länge",
+    "widthM": "Breite",
+    "eaveHeightM": "Traufhöhe",
+    "ridgeHeightM": "Firsthöhe",
+    "lowEaveHeightM": "Traufhöhe (tief)",
+    "highEaveHeightM": "Traufhöhe (hoch)",
+    "hipInsetM": "Walm-Einzug",
+    "roofHeightM": "Dachhöhe",
+    "parapetHeightM": "Attika-Höhe",
+    "azimuthDeg": "Ausrichtung"
   }
 }

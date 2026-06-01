@@ -27,5 +27,30 @@
     "footprintFound": "Building footprint found.",
     "footprintMissing": "No building footprint found — you can enter free dimensions later.",
     "restored": "Restored your last session."
+  },
+  "Dach": {
+    "title": "Choose a roof shape",
+    "subtitle": "Pick a roof template and adjust the dimensions. The 3D house reacts instantly.",
+    "surfaceSummary": "{count} roof faces · {area} m² roof area"
+  },
+  "RoofTemplates": {
+    "satteldach": "Gable roof",
+    "pultdach": "Mono-pitch roof",
+    "walmdach": "Hip roof",
+    "flachdach": "Flat roof",
+    "reihenhaus-sattel": "Terraced gable"
+  },
+  "RoofParams": {
+    "spanM": "Span",
+    "lengthM": "Length",
+    "widthM": "Width",
+    "eaveHeightM": "Eave height",
+    "ridgeHeightM": "Ridge height",
+    "lowEaveHeightM": "Eave height (low)",
+    "highEaveHeightM": "Eave height (high)",
+    "hipInsetM": "Hip inset",
+    "roofHeightM": "Roof height",
+    "parapetHeightM": "Parapet height",
+    "azimuthDeg": "Orientation"
   }
 }

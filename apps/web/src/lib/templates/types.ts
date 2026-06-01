@@ -32,6 +32,12 @@ export interface RoofGeometry {
   surfaces: RoofSurface[];
   /** Building footprint ring at ground level (y = 0). */
   groundPolygon: Vec3[];
+  /**
+   * Vertical wall fills ABOVE the uniform eave-height extrusion (gable-end
+   * triangles, mono-pitch end caps). Render-only — not roof surfaces, carry no
+   * yield. Renderers extrude `groundPolygon` to `eaveHeightM` then add these.
+   */
+  gableFaces: Vec3[][];
 }
 
 // --- Per-template parameter sets ----------------------------------------

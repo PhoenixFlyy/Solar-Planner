@@ -3,6 +3,8 @@
 // models so an account sync is a straight INSERT/SELECT later.
 import Dexie, { type Table } from "dexie";
 
+import type { RoofParams, RoofTemplateId } from "@/lib/templates";
+
 export interface StoredLatLng {
   lat: number;
   lng: number;
@@ -14,12 +16,19 @@ export interface StoredLocation {
   lng: number;
 }
 
+/** Chosen roof template + its parameters (mirrors the editor state). */
+export interface RoofConfig {
+  templateId: RoofTemplateId;
+  params: RoofParams;
+}
+
 export interface PlannerProject {
   /** Single current project in MVP (multi-project is Phase 2). */
   id: string;
   address: string;
   location: StoredLocation | null;
   footprint: { points: StoredLatLng[] } | null;
+  roof: RoofConfig | null;
   updatedAt: number;
 }
 
@@ -47,6 +56,7 @@ export async function saveProject(patch: Partial<Omit<PlannerProject, "id" | "up
     address: "",
     location: null,
     footprint: null,
+    roof: null,
     ...existing,
     ...patch,
     updatedAt: Date.now(),
