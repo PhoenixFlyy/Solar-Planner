@@ -44,7 +44,10 @@
     "chimney": "Chimney",
     "removeObstacle": "Remove",
     "placeHint": "Click a roof face to place it.",
-    "dragHint": "Drag an obstacle to move it — the layout carves out its area."
+    "dragHint": "Drag an obstacle to move it — the layout carves out its area.",
+    "heatmap": "Yield heatmap",
+    "yieldLoading": "Calculating yield …",
+    "annualYield": "≈ {kwh} kWh/year"
   },
   "Sun": {
     "time": "Time of day",

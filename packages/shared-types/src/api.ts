@@ -75,6 +75,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/solar/yield": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** System Yield */
+        post: operations["system_yield_api_v1_solar_yield_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -158,6 +175,36 @@ export interface components {
              */
             elevation: number;
         };
+        /** SurfaceYield */
+        SurfaceYield: {
+            /** Annual Kwh */
+            annual_kwh: number;
+            /** Azimuth */
+            azimuth: number;
+            /** Kwp */
+            kwp: number;
+            /**
+             * Specific Kwh Per Kwp
+             * @description PVGIS annual yield per kWp at this orientation.
+             */
+            specific_kwh_per_kwp: number;
+            /** Surface Id */
+            surface_id: string;
+            /** Tilt */
+            tilt: number;
+        };
+        /** SystemYield */
+        SystemYield: {
+            /** Annual Kwh */
+            annual_kwh: number;
+            /**
+             * Monthly Kwh
+             * @description 12 values, Jan..Dec, aggregated over surfaces.
+             */
+            monthly_kwh: number[];
+            /** Per Surface */
+            per_surface: components["schemas"]["SurfaceYield"][];
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -170,6 +217,32 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /** YieldRequest */
+        YieldRequest: {
+            /** Lat */
+            lat: number;
+            /** Lng */
+            lng: number;
+            /** Surfaces */
+            surfaces: components["schemas"]["YieldSurfaceInput"][];
+        };
+        /**
+         * YieldSurfaceInput
+         * @description One roof surface to evaluate: orientation + installed capacity.
+         */
+        YieldSurfaceInput: {
+            /**
+             * Azimuth
+             * @description pvlib frame: 0=N, 90=E, 180=S, 270=W.
+             */
+            azimuth: number;
+            /** Id */
+            id: string;
+            /** Kwp */
+            kwp: number;
+            /** Tilt */
+            tilt: number;
         };
     };
     responses: never;
@@ -286,6 +359,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SunPosition"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    system_yield_api_v1_solar_yield_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["YieldRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemYield"];
                 };
             };
             /** @description Validation Error */

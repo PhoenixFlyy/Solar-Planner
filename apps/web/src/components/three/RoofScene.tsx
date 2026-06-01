@@ -23,6 +23,7 @@ export interface RoofSceneProps {
   panels?: PanelPlacement[];
   removedPanels?: Set<string>;
   onTogglePanel?: (id: string) => void;
+  panelColorFor?: (placement: PanelPlacement) => string;
   obstacles?: Obstacle[];
   selectedObstacleId?: string | null;
   onMoveObstacle?: (id: string, u: number, v: number) => void;
@@ -42,6 +43,7 @@ export function RoofScene({
   panels,
   removedPanels,
   onTogglePanel,
+  panelColorFor,
   obstacles,
   selectedObstacleId,
   onMoveObstacle,
@@ -105,6 +107,7 @@ export function RoofScene({
             placements={panels}
             removed={removedPanels ?? EMPTY}
             onTogglePanel={onTogglePanel}
+            colorFor={panelColorFor}
           />
         )}
 

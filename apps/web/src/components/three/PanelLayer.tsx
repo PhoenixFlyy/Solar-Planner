@@ -10,10 +10,12 @@ export interface PanelLayerProps {
   placements: PanelPlacement[];
   removed: Set<string>;
   onTogglePanel?: (id: string) => void;
+  /** Heatmap: per-panel color (CSS string). Omitted → uniform panel color. */
+  colorFor?: (placement: PanelPlacement) => string;
 }
 
 /** PV modules as a single instanced mesh (CLAUDE.md: instanced for panels). */
-export function PanelLayer({ placements, removed, onTogglePanel }: PanelLayerProps) {
+export function PanelLayer({ placements, removed, onTogglePanel, colorFor }: PanelLayerProps) {
   const { mesh, visible } = useMemo(() => {
     const visible = placements.filter((p) => !removed.has(p.id));
     const geo = new THREE.BoxGeometry(PANEL.widthM, PANEL.thicknessM, PANEL.heightM);
@@ -25,6 +27,8 @@ export function PanelLayer({ placements, removed, onTogglePanel }: PanelLayerPro
     const mesh = new THREE.InstancedMesh(geo, mat, visible.length);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
+
+    const color = new THREE.Color();
 
     const m = new THREE.Matrix4();
     const ux = new THREE.Vector3();
@@ -44,10 +48,15 @@ export function PanelLayer({ placements, removed, onTogglePanel }: PanelLayerPro
       );
       m.setPosition(pos);
       mesh.setMatrixAt(i, m);
+      if (colorFor) {
+        color.set(colorFor(p));
+        mesh.setColorAt(i, color);
+      }
     });
     mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     return { mesh, visible };
-  }, [placements, removed]);
+  }, [placements, removed, colorFor]);
 
   // Dispose GPU resources when the mesh is replaced/unmounted.
   useEffect(() => {

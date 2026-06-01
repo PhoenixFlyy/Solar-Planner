@@ -44,7 +44,10 @@
     "chimney": "Schornstein",
     "removeObstacle": "Entfernen",
     "placeHint": "Auf Dachfläche klicken zum Platzieren.",
-    "dragHint": "Hindernis ziehen zum Verschieben – die Belegung spart die Fläche aus."
+    "dragHint": "Hindernis ziehen zum Verschieben – die Belegung spart die Fläche aus.",
+    "heatmap": "Ertrags-Heatmap",
+    "yieldLoading": "Ertrag wird berechnet …",
+    "annualYield": "≈ {kwh} kWh/Jahr"
   },
   "Sun": {
     "time": "Uhrzeit",

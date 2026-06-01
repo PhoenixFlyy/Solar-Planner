@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { useQuery } from "@tanstack/react-query";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslations } from "next-intl";
 
@@ -12,10 +13,12 @@ import { sunPosition } from "@/lib/solar/sun-position";
 import {
   kWpFor,
   layoutGeometry,
+  PANEL,
   projectToSurfaceUV,
   surfaceBasis,
   type ObstacleKind,
 } from "@/lib/solar/panel-layout";
+import { fetchSystemYield } from "@/lib/api/solar";
 import { Link } from "@/i18n/navigation";
 import { TemplatePicker } from "@/components/planner/TemplatePicker";
 import { RoofParamSliders } from "@/components/planner/RoofParamSliders";
@@ -82,6 +85,7 @@ export default function DachPage() {
   );
 
   const totalAreaM2 = geometry ? geometry.surfaces.reduce((a, s) => a + s.areaM2, 0) : 0;
+  const loc = stored?.location ?? DEFAULT_LOCATION;
 
   // Auto-layout panels; obstacles carve out area, removals trim the count.
   const placements = useMemo(
@@ -90,6 +94,55 @@ export default function DachPage() {
   );
   const panelCount = placements.filter((p) => !removedPanelIds.has(p.id)).length;
   const kWp = kWpFor(panelCount);
+
+  // Installed kWp per surface (visible panels) → yield request.
+  const kwpBySurface = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const p of placements) {
+      if (!removedPanelIds.has(p.id))
+        m.set(p.surfaceId, (m.get(p.surfaceId) ?? 0) + PANEL.ratedWp / 1000);
+    }
+    return m;
+  }, [placements, removedPanelIds]);
+
+  const yieldSurfaces = useMemo(
+    () =>
+      geometry
+        ? geometry.surfaces
+            .filter((s) => (kwpBySurface.get(s.id) ?? 0) > 0)
+            .map((s) => ({
+              id: s.id,
+              tilt: s.tiltDeg,
+              azimuth: s.azimuthDeg,
+              kwp: kwpBySurface.get(s.id) ?? 0,
+            }))
+        : [],
+    [geometry, kwpBySurface],
+  );
+
+  const [heatmap, setHeatmap] = useState(false);
+  const yieldQuery = useQuery({
+    queryKey: ["yield", loc.lat, loc.lng, JSON.stringify(yieldSurfaces)],
+    queryFn: () => fetchSystemYield({ lat: loc.lat, lng: loc.lng, surfaces: yieldSurfaces }),
+    enabled: heatmap && yieldSurfaces.length > 0,
+  });
+
+  // Per-surface specific yield → normalized heatmap color (blue low → red high).
+  const panelColorFor = useMemo(() => {
+    const data = yieldQuery.data;
+    if (!heatmap || !data) return undefined;
+    const bySurface = new Map(data.per_surface.map((s) => [s.surface_id, s.specific_kwh_per_kwp]));
+    const vals = [...bySurface.values()];
+    if (vals.length === 0) return undefined;
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    return (p: { surfaceId: string }) => {
+      const v = bySurface.get(p.surfaceId);
+      if (v === undefined) return "#1e3a8a";
+      const tNorm = max > min ? (v - min) / (max - min) : 0.5;
+      return `hsl(${Math.round((1 - tNorm) * 240)}, 80%, 50%)`;
+    };
+  }, [heatmap, yieldQuery.data]);
 
   // Place an armed obstacle where the user clicked a roof face; else select.
   function handleSurfaceClick(surfaceId: string, point: [number, number, number]) {
@@ -107,7 +160,6 @@ export default function DachPage() {
 
   // Sun / time-of-year for the live light + shadows.
   const [sunTime, setSunTime] = useState<SunTime>({ month: 6, day: 21, hour: 12 });
-  const loc = stored?.location ?? DEFAULT_LOCATION;
   const sun = useMemo(() => {
     // Approximate CET (UTC+1); DST ignored for a schematic sun.
     const date = new Date(Date.UTC(2025, sunTime.month - 1, sunTime.day, sunTime.hour - 1, 0));
@@ -152,6 +204,7 @@ export default function DachPage() {
               panels={placements}
               removedPanels={removedPanelIds}
               onTogglePanel={togglePanel}
+              panelColorFor={panelColorFor}
               obstacles={obstacles}
               selectedObstacleId={selectedObstacleId}
               onMoveObstacle={moveObstacle}
@@ -205,6 +258,26 @@ export default function DachPage() {
                   {t("kwp", { kwp: kWp.toFixed(1) })}
                 </span>
                 <p className="text-xs text-neutral-400">{t("removeHint")}</p>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <Button
+                  size="sm"
+                  variant={heatmap ? "default" : "outline"}
+                  onClick={() => setHeatmap((h) => !h)}
+                >
+                  {t("heatmap")}
+                </Button>
+                {heatmap && yieldQuery.isPending && (
+                  <span className="text-xs text-neutral-400">{t("yieldLoading")}</span>
+                )}
+                {heatmap && yieldQuery.data && (
+                  <span className="text-sm text-neutral-600">
+                    {t("annualYield", {
+                      kwh: Math.round(yieldQuery.data.annual_kwh).toLocaleString("de-DE"),
+                    })}
+                  </span>
+                )}
               </div>
 
               <div className="flex flex-col gap-1.5">

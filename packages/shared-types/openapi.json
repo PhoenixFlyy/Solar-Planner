@@ -212,6 +212,75 @@
         "title": "SunPosition",
         "type": "object"
       },
+      "SurfaceYield": {
+        "properties": {
+          "annual_kwh": {
+            "title": "Annual Kwh",
+            "type": "number"
+          },
+          "azimuth": {
+            "title": "Azimuth",
+            "type": "number"
+          },
+          "kwp": {
+            "title": "Kwp",
+            "type": "number"
+          },
+          "specific_kwh_per_kwp": {
+            "description": "PVGIS annual yield per kWp at this orientation.",
+            "title": "Specific Kwh Per Kwp",
+            "type": "number"
+          },
+          "surface_id": {
+            "title": "Surface Id",
+            "type": "string"
+          },
+          "tilt": {
+            "title": "Tilt",
+            "type": "number"
+          }
+        },
+        "required": [
+          "surface_id",
+          "tilt",
+          "azimuth",
+          "kwp",
+          "specific_kwh_per_kwp",
+          "annual_kwh"
+        ],
+        "title": "SurfaceYield",
+        "type": "object"
+      },
+      "SystemYield": {
+        "properties": {
+          "annual_kwh": {
+            "title": "Annual Kwh",
+            "type": "number"
+          },
+          "monthly_kwh": {
+            "description": "12 values, Jan..Dec, aggregated over surfaces.",
+            "items": {
+              "type": "number"
+            },
+            "title": "Monthly Kwh",
+            "type": "array"
+          },
+          "per_surface": {
+            "items": {
+              "$ref": "#/components/schemas/SurfaceYield"
+            },
+            "title": "Per Surface",
+            "type": "array"
+          }
+        },
+        "required": [
+          "annual_kwh",
+          "per_surface",
+          "monthly_kwh"
+        ],
+        "title": "SystemYield",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -250,6 +319,71 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "YieldRequest": {
+        "properties": {
+          "lat": {
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lng": {
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lng",
+            "type": "number"
+          },
+          "surfaces": {
+            "items": {
+              "$ref": "#/components/schemas/YieldSurfaceInput"
+            },
+            "title": "Surfaces",
+            "type": "array"
+          }
+        },
+        "required": [
+          "lat",
+          "lng",
+          "surfaces"
+        ],
+        "title": "YieldRequest",
+        "type": "object"
+      },
+      "YieldSurfaceInput": {
+        "description": "One roof surface to evaluate: orientation + installed capacity.",
+        "properties": {
+          "azimuth": {
+            "description": "pvlib frame: 0=N, 90=E, 180=S, 270=W.",
+            "exclusiveMaximum": 360.0,
+            "minimum": 0.0,
+            "title": "Azimuth",
+            "type": "number"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kwp": {
+            "minimum": 0.0,
+            "title": "Kwp",
+            "type": "number"
+          },
+          "tilt": {
+            "maximum": 90.0,
+            "minimum": 0.0,
+            "title": "Tilt",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "tilt",
+          "azimuth",
+          "kwp"
+        ],
+        "title": "YieldSurfaceInput",
         "type": "object"
       }
     }
@@ -440,6 +574,47 @@
           }
         },
         "summary": "Sun Position",
+        "tags": [
+          "solar"
+        ]
+      }
+    },
+    "/api/v1/solar/yield": {
+      "post": {
+        "operationId": "system_yield_api_v1_solar_yield_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/YieldRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemYield"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Yield",
         "tags": [
           "solar"
         ]
