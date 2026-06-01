@@ -26,12 +26,15 @@
     "noResults": "Keine Treffer gefunden.",
     "footprintFound": "Gebäudeumriss gefunden.",
     "footprintMissing": "Kein Gebäudeumriss gefunden – du kannst später freie Maße eingeben.",
-    "restored": "Letzter Stand wiederhergestellt."
+    "restored": "Letzter Stand wiederhergestellt.",
+    "continueToRoof": "Weiter: Dach"
   },
   "Dach": {
     "title": "Dachform wählen",
     "subtitle": "Wähle ein Dach-Template und passe die Maße an. Das 3D-Haus reagiert sofort.",
-    "surfaceSummary": "{count} Dachflächen · {area} m² Dachfläche"
+    "surfaceSummary": "{count} Dachflächen · {area} m² Dachfläche",
+    "useFootprint": "Maße aus Gebäude übernehmen",
+    "back": "Zurück"
   },
   "RoofTemplates": {
     "satteldach": "Satteldach",

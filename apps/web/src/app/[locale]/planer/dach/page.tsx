@@ -7,9 +7,11 @@ import { useTranslations } from "next-intl";
 
 import { CURRENT_PROJECT_ID, db, saveProject } from "@/lib/db/db";
 import { useRoofStore } from "@/lib/store/roof";
-import { getTemplate } from "@/lib/templates";
+import { applyDimensions, footprintDimensions, getTemplate } from "@/lib/templates";
+import { Link } from "@/i18n/navigation";
 import { TemplatePicker } from "@/components/planner/TemplatePicker";
 import { RoofParamSliders } from "@/components/planner/RoofParamSliders";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 // R3F is client-only (WebGL) — never SSR it.
@@ -26,6 +28,7 @@ export default function DachPage() {
   const selectedSurfaceId = useRoofStore((s) => s.selectedSurfaceId);
   const selectTemplate = useRoofStore((s) => s.selectTemplate);
   const setParam = useRoofStore((s) => s.setParam);
+  const setParams = useRoofStore((s) => s.setParams);
   const selectSurface = useRoofStore((s) => s.selectSurface);
   const hydrate = useRoofStore((s) => s.hydrate);
 
@@ -53,14 +56,32 @@ export default function DachPage() {
 
   const totalAreaM2 = geometry ? geometry.surfaces.reduce((a, s) => a + s.areaM2, 0) : 0;
 
+  const footprintPoints = stored?.footprint?.points ?? null;
+  function applyFootprint() {
+    if (!footprintPoints || !params) return;
+    const dims = footprintDimensions(footprintPoints);
+    if (dims) setParams(applyDimensions(params, dims));
+  }
+
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-12">
-      <div>
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <p className="text-sm text-neutral-500">{t("subtitle")}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="text-sm text-neutral-500">{t("subtitle")}</p>
+        </div>
+        <Button asChild variant="ghost" size="sm">
+          <Link href="/planer">{t("back")}</Link>
+        </Button>
       </div>
 
       <TemplatePicker selectedId={templateId} onSelect={selectTemplate} />
+
+      {footprintPoints && params && (
+        <Button variant="outline" size="sm" className="self-start" onClick={applyFootprint}>
+          {t("useFootprint")}
+        </Button>
+      )}
 
       {geometry && params && (
         <div className="grid gap-6 lg:grid-cols-[1fr_18rem]">

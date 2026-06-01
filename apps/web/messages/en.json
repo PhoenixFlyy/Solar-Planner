@@ -26,12 +26,15 @@
     "noResults": "No matches found.",
     "footprintFound": "Building footprint found.",
     "footprintMissing": "No building footprint found — you can enter free dimensions later.",
-    "restored": "Restored your last session."
+    "restored": "Restored your last session.",
+    "continueToRoof": "Next: roof"
   },
   "Dach": {
     "title": "Choose a roof shape",
     "subtitle": "Pick a roof template and adjust the dimensions. The 3D house reacts instantly.",
-    "surfaceSummary": "{count} roof faces · {area} m² roof area"
+    "surfaceSummary": "{count} roof faces · {area} m² roof area",
+    "useFootprint": "Use building dimensions",
+    "back": "Back"
   },
   "RoofTemplates": {
     "satteldach": "Gable roof",

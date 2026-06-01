@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 
 import { fetchFootprint, geocode, type GeocodeResult } from "@/lib/api/geo";
 import { CURRENT_PROJECT_ID, db, saveProject } from "@/lib/db/db";
+import { Link } from "@/i18n/navigation";
 import { FootprintMap } from "@/components/map/FootprintMap";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -105,6 +106,9 @@ export default function PlanerPage() {
           <p className="text-sm text-neutral-600">
             {footprint ? t("footprintFound") : t("footprintMissing")}
           </p>
+          <Button asChild className="self-start">
+            <Link href="/planer/dach">{t("continueToRoof")}</Link>
+          </Button>
         </section>
       )}
     </main>

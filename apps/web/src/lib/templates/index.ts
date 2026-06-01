@@ -106,3 +106,9 @@ export function getTemplate(id: RoofTemplateId): RoofTemplate {
 
 export * from "./types";
 export { buildFlat, buildGable, buildHip, buildMono } from "./builders";
+export {
+  applyDimensions,
+  footprintDimensions,
+  type BuildingDimensions,
+  type FootprintLatLng,
+} from "./footprint";

@@ -14,6 +14,7 @@ interface RoofState {
 
   selectTemplate: (id: RoofTemplateId) => void;
   setParam: (key: string, value: number) => void;
+  setParams: (params: RoofParams) => void;
   selectSurface: (id: string | null) => void;
   hydrate: (config: RoofConfig | null) => void;
   toConfig: () => RoofConfig | null;
@@ -33,6 +34,8 @@ export const useRoofStore = create<RoofState>((set, get) => ({
     }),
 
   setParam: (key, value) => set((s) => (s.params ? { params: { ...s.params, [key]: value } } : s)),
+
+  setParams: (params) => set({ params: { ...params } }),
 
   selectSurface: (id) => set({ selectedSurfaceId: id }),
 
