@@ -18,9 +18,14 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </p>
       </div>
 
-      <Button asChild size="lg">
-        <Link href="/planer">{t("cta")}</Link>
-      </Button>
+      <div className="flex flex-col items-center gap-2">
+        <Button asChild size="lg">
+          <Link href="/planer">{t("cta")}</Link>
+        </Button>
+        <Button asChild variant="ghost" size="sm">
+          <Link href="/schnellrechner">{t("quickCalc")}</Link>
+        </Button>
+      </div>
 
       <p className="text-sm text-neutral-500">{t("noLogin")}</p>
 

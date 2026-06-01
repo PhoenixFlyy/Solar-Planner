@@ -42,7 +42,7 @@ export interface EconomicsResult {
   monthlyProductionKwh: number[];
 }
 
-const DEFAULTS = {
+export const ECONOMICS_DEFAULTS = {
   electricityPriceEurPerKwh: 0.35,
   feedInTariffEurPerKwh: 0.08,
   pricePerKwpEur: 1500,
@@ -53,6 +53,7 @@ const DEFAULTS = {
   priceInflation: 0.03,
   degradation: 0.005,
 };
+const DEFAULTS = ECONOMICS_DEFAULTS;
 
 const STORAGE_CYCLES_PER_YEAR = 300;
 const BASE_DIRECT_SELF_USE = 0.3; // ~30% of production used directly w/o storage

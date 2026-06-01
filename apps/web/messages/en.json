@@ -39,7 +39,22 @@
     "title": "Plan your solar system — playfully.",
     "subtitle": "From the first \"is it worth it for me?\" to a finished plan. Enter your address, see your house, plan, export — all in one tool.",
     "cta": "Start Solar Planner",
-    "noLogin": "No login required. Your plan is saved on this device."
+    "noLogin": "No login required. Your plan is saved on this device.",
+    "quickCalc": "Quick calc (mobile)"
+  },
+  "Schnellrechner": {
+    "title": "Quick calc",
+    "subtitle": "A rough estimate in 30 seconds — no 3D.",
+    "kwp": "System size: {v} kWp",
+    "azimuth": "Orientation: {v}°",
+    "tilt": "Tilt: {v}°",
+    "demand": "Consumption: {v} kWh/year",
+    "annualYield": "Annual yield",
+    "payback": "Payback",
+    "years": "{n} years",
+    "savings": "Savings/year",
+    "disclaimer": "Rough estimate. Use the full planner for details.",
+    "toFull": "To the full planner"
   },
   "ApiHealth": {
     "title": "API status",
@@ -109,7 +124,14 @@
     "configureRoofFirst": "Please configure the roof first.",
     "toRoof": "To the roof",
     "disclaimer": "Estimates. Not a substitute for a professional quote.",
-    "continueToExport": "Next: export"
+    "continueToExport": "Next: export",
+    "proMode": "Pro mode",
+    "proTitle": "Parameters (pro)",
+    "proField_electricityPriceEurPerKwh": "Electricity €/kWh",
+    "proField_feedInTariffEurPerKwh": "Feed-in €/kWh",
+    "proField_pricePerKwpEur": "Price €/kWp",
+    "proField_pricePerStorageKwhEur": "Storage €/kWh",
+    "proField_subsidyEur": "Subsidy €"
   },
   "Export": {
     "title": "Export",
@@ -128,6 +150,7 @@
     "share": "Copy link",
     "shareCopied": "Copied!",
     "importJson": "Import JSON",
+    "hourlyCsv": "Hourly CSV",
     "overviewSheet": "Overview",
     "monthlySheet": "Monthly yield",
     "cashflowSheet": "Cashflow",

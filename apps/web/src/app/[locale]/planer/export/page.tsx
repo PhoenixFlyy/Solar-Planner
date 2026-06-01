@@ -11,8 +11,10 @@ import { useRoofStore } from "@/lib/store/roof";
 import { getTemplate, type RoofTemplateId } from "@/lib/templates";
 import { layoutGeometry, PANEL } from "@/lib/solar/panel-layout";
 import { fetchSystemYield } from "@/lib/api/solar";
-import { estimateAnnualDemand } from "@/lib/economics/consumption";
+import { demandComponents, estimateAnnualDemand } from "@/lib/economics/consumption";
 import { computeEconomics } from "@/lib/economics/model";
+import { simulateYear } from "@/lib/simulation/simulate";
+import { buildHourlyCsv } from "@/lib/export/csv";
 import { serializeProject, parseProject } from "@/lib/export/project";
 import { buildShareUrl } from "@/lib/export/share";
 import { buildXlsxBlob } from "@/lib/export/xlsx";
@@ -93,6 +95,17 @@ export default function ExportPage() {
     enabled: yieldSurfaces.length > 0,
   });
 
+  const sim = useMemo(() => {
+    if (!yieldQuery.data || !stored?.economics) return null;
+    return simulateYear({
+      monthlyPvKwh: yieldQuery.data.monthly_kwh,
+      demand: demandComponents(stored.economics),
+      storageKwh: stored.economics.storageKwh,
+      lat: loc.lat,
+      lng: loc.lng,
+    });
+  }, [yieldQuery.data, stored?.economics, loc.lat, loc.lng]);
+
   const economics = useMemo(() => {
     if (!yieldQuery.data || !stored?.economics) return null;
     return computeEconomics({
@@ -101,8 +114,9 @@ export default function ExportPage() {
       monthlyProductionKwh: yieldQuery.data.monthly_kwh,
       kWp,
       storageKwh: stored.economics.storageKwh,
+      selfConsumptionOverrideKwh: sim?.selfConsumptionKwh,
     });
-  }, [yieldQuery.data, stored?.economics, kWp]);
+  }, [yieldQuery.data, stored?.economics, kWp, sim]);
 
   const summary: PlanSummary = {
     address: stored?.address || "—",
@@ -150,6 +164,9 @@ export default function ExportPage() {
   }
   function exportJson() {
     if (stored) saveText(serializeProject(stored), "solar-planner.json");
+  }
+  function exportCsv() {
+    if (sim) saveText(buildHourlyCsv(sim), "solar-planner-hourly.csv", "text/csv");
   }
   async function importJson(file: File) {
     const parsed = parseProject(await file.text());
@@ -206,6 +223,9 @@ export default function ExportPage() {
             <Button onClick={exportXlsx}>XLSX</Button>
             <Button onClick={exportJson}>JSON</Button>
             <Button onClick={exportPng}>PNG</Button>
+            <Button onClick={exportCsv} disabled={!sim}>
+              {t("hourlyCsv")}
+            </Button>
             <Button variant="outline" onClick={copyShare}>
               {shareCopied ? t("shareCopied") : t("share")}
             </Button>

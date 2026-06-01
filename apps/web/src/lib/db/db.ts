@@ -35,6 +35,12 @@ export interface EconomicsConfig {
   eCar: boolean;
   heatPump: boolean;
   storageKwh: number;
+  /** Pro-mode tariff/cost overrides (undefined → model defaults). */
+  electricityPriceEurPerKwh?: number;
+  feedInTariffEurPerKwh?: number;
+  pricePerKwpEur?: number;
+  pricePerStorageKwhEur?: number;
+  subsidyEur?: number;
 }
 
 export interface PlannerProject {

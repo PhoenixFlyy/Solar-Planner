@@ -11,12 +11,29 @@ import { getTemplate } from "@/lib/templates";
 import { layoutGeometry, PANEL } from "@/lib/solar/panel-layout";
 import { fetchSystemYield } from "@/lib/api/solar";
 import { demandComponents, estimateAnnualDemand } from "@/lib/economics/consumption";
-import { computeEconomics } from "@/lib/economics/model";
+import { computeEconomics, ECONOMICS_DEFAULTS } from "@/lib/economics/model";
 import { simulateYear } from "@/lib/simulation/simulate";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+
+const PRO_FIELDS = [
+  "electricityPriceEurPerKwh",
+  "feedInTariffEurPerKwh",
+  "pricePerKwpEur",
+  "pricePerStorageKwhEur",
+  "subsidyEur",
+] as const;
+type ProField = (typeof PRO_FIELDS)[number];
+
+/** Only the defined pro-tariff overrides (so they never clobber defaults). */
+function definedTariffs(e: EconomicsConfig): Partial<Record<ProField, number>> {
+  const out: Partial<Record<ProField, number>> = {};
+  for (const f of PRO_FIELDS) if (typeof e[f] === "number") out[f] = e[f] as number;
+  return out;
+}
 import { CashflowChart } from "@/components/charts/CashflowChart";
 import { MonthlyProductionChart } from "@/components/charts/MonthlyProductionChart";
 import { EnergySplitChart } from "@/components/charts/EnergySplitChart";
@@ -49,7 +66,17 @@ export default function WirtschaftPage() {
 
   // Economics inputs (persons/EV/heat-pump/storage), hydrated once + persisted.
   const [econ, setEcon] = useState<EconomicsConfig>(DEFAULT_ECON);
+  const [pro, setPro] = useState(false);
   const econHydrated = useRef(false);
+
+  function enablePro() {
+    setEcon((e) => {
+      const seeded = { ...e };
+      for (const f of PRO_FIELDS) if (seeded[f] == null) seeded[f] = ECONOMICS_DEFAULTS[f];
+      return seeded;
+    });
+    setPro(true);
+  }
   useEffect(() => {
     if (!econHydrated.current && stored !== undefined) {
       setEcon(stored?.economics ?? DEFAULT_ECON);
@@ -127,8 +154,9 @@ export default function WirtschaftPage() {
       kWp,
       storageKwh: econ.storageKwh,
       selfConsumptionOverrideKwh: sim?.selfConsumptionKwh,
+      ...definedTariffs(econ),
     });
-  }, [yieldQuery.data, demandKwh, kWp, econ.storageKwh, sim]);
+  }, [yieldQuery.data, demandKwh, kWp, econ, sim]);
 
   if (roofHydrated.current && !templateId) {
     return (
@@ -193,6 +221,28 @@ export default function WirtschaftPage() {
               <Row label={t("demand")} value={`${demandKwh.toLocaleString("de-DE")} kWh`} />
               <Row label={t("system")} value={`${kWp.toFixed(1)} kWp`} />
             </dl>
+
+            {pro ? (
+              <div className="flex flex-col gap-2 border-t border-neutral-200 pt-3">
+                <span className="text-sm font-medium text-neutral-700">{t("proTitle")}</span>
+                {PRO_FIELDS.map((f) => (
+                  <label key={f} className="flex items-center justify-between gap-2 text-sm">
+                    <span className="text-neutral-600">{t(`proField_${f}`)}</span>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      className="h-8 w-24"
+                      value={econ[f] ?? ECONOMICS_DEFAULTS[f]}
+                      onChange={(ev) => setEcon((e) => ({ ...e, [f]: Number(ev.target.value) }))}
+                    />
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <Button variant="outline" size="sm" onClick={enablePro}>
+                {t("proMode")}
+              </Button>
+            )}
           </CardContent>
         </Card>
 
