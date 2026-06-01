@@ -1,7 +1,7 @@
 # Sprint 1 — MVP Recap
 
 *Date: 2026-06-01 · Branch: `main` (pushed) · Status: M1.0–M1.7 + M1.9 done;
-M1.8 awaiting maintainer decision*
+M1.8 deferred to Phase 2 (maintainer decision 2026-06-01)*
 
 Sprint 1 (Part 11) built the gamified 3D planner + economics + exports on top
 of Sprint 0. Worked directly on `main`, one commit per milestone, pushed.
@@ -19,7 +19,7 @@ of Sprint 0. Worked directly on `main`, one commit per milestone, pushed.
 | M1.6 | Consumption wizard + storage + economics (autarky/payback/cashflow) + Recharts | `ab6f42c` |
 | M1.7 | Export hub: PDF, XLSX, JSON (+import), PNG, self-contained share-link + /share | `4e9a09d` |
 | M1.9 | Footer disclaimer, consent banner, Impressum + Datenschutz, robots | `9910401` |
-| M1.8 | **Not started — needs maintainer decision (see below)** | — |
+| M1.8 | **Deferred to Phase 2** (maintainer decision) — anon-first + the self-contained share-link cover MVP persistence/sharing | — |
 
 ## End-to-end flow (works today, offline + free)
 
@@ -59,12 +59,11 @@ IndexedDB and survives reload.
 
 ## Open / needs maintainer input
 
-- **M1.8 — optional Supabase account + sync.** Not built. Adding Supabase
-  Auth is an *"Ask before"* item (new core auth dependency, CLAUDE.md) and
-  cannot be verified without a Supabase project + keys. Options: (a) provide
-  Supabase Free project URL + anon key and have it wired with graceful
-  degradation; (b) build it behind a feature flag, untested against a real
-  project; (c) defer to Phase 2. Awaiting decision.
+- **M1.8 — optional Supabase account + sync. DEFERRED to Phase 2** (maintainer
+  decision 2026-06-01). Adding Supabase Auth is an *"Ask before"* item (new
+  core auth dependency) and needs a real project to verify; anon-first
+  IndexedDB + the self-contained share-link already cover MVP persistence and
+  sharing. Revisit when cross-device sync is actually needed.
 - **CI deprecation:** GitHub will force Node 20 actions to Node 24 on
   2026-06-16. Current action majors still work; bump when newer majors ship.
 - **Python 3.14 local shim vs locked 3.12** and **uv on PATH for git hooks**
