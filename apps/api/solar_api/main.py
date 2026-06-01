@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from solar_api.core.config import get_settings
 from solar_api.core.exceptions import register_exception_handlers
-from solar_api.routers import geo, health
+from solar_api.routers import geo, health, solar
 
 API_V1 = "/api/v1"
 
@@ -37,6 +37,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router, prefix=API_V1)
     app.include_router(geo.router, prefix=API_V1)
+    app.include_router(solar.router, prefix=API_V1)
 
     return app
 

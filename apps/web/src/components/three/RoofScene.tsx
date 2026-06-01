@@ -1,15 +1,19 @@
 "use client";
 
+import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Grid, OrbitControls } from "@react-three/drei";
 
 import type { RoofGeometry } from "@/lib/templates";
+import { sunDirection, type SunPosition } from "@/lib/solar/sun-position";
 import { RoofMesh } from "./RoofMesh";
 
 export interface RoofSceneProps {
   geometry: RoofGeometry;
   selectedSurfaceId?: string | null;
   onSelectSurface?: (id: string) => void;
+  /** Sun position for the directional light; omitted = a fixed default sun. */
+  sun?: SunPosition;
   className?: string;
 }
 
@@ -21,18 +25,31 @@ export function RoofScene({
   geometry,
   selectedSurfaceId,
   onSelectSurface,
+  sun,
   className,
 }: RoofSceneProps) {
   const target: [number, number, number] = [0, geometry.ridgeHeightM / 2, 0];
   const reach = Math.max(geometry.footprintWidthM, geometry.footprintDepthM);
 
+  const { lightPos, daylight } = useMemo(() => {
+    const dist = reach * 2.5;
+    if (!sun) return { lightPos: [reach, reach * 1.5, reach * 0.6] as const, daylight: 1 };
+    const [dx, dy, dz] = sunDirection(sun.azimuthDeg, Math.max(sun.elevationDeg, 2));
+    // Fade out below the horizon (dusk/night).
+    const day = Math.max(0, Math.min(1, (sun.elevationDeg + 2) / 8));
+    return { lightPos: [dx * dist, dy * dist, dz * dist] as const, daylight: day };
+  }, [sun, reach]);
+
   return (
-    <div className={className ?? "h-[28rem] w-full overflow-hidden rounded-lg bg-sky-50"}>
+    <div
+      className={className ?? "h-[28rem] w-full overflow-hidden rounded-lg bg-sky-50"}
+      data-testid="roof-scene"
+    >
       <Canvas shadows camera={{ position: [reach, reach * 0.9, reach], fov: 45 }} dpr={[1, 2]}>
-        <ambientLight intensity={0.5} />
+        <ambientLight intensity={0.35 + 0.2 * daylight} />
         <directionalLight
-          position={[reach, reach * 1.5, reach * 0.6]}
-          intensity={1.4}
+          position={lightPos}
+          intensity={0.3 + 1.2 * daylight}
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
@@ -41,8 +58,16 @@ export function RoofScene({
           shadow-camera-top={reach}
           shadow-camera-bottom={-reach}
           shadow-camera-near={0.5}
-          shadow-camera-far={reach * 4}
+          shadow-camera-far={reach * 6}
         />
+
+        {/* Visible sun marker */}
+        {sun && sun.elevationDeg > 0 && (
+          <mesh position={lightPos}>
+            <sphereGeometry args={[reach * 0.06, 16, 16]} />
+            <meshBasicMaterial color="#fde047" />
+          </mesh>
+        )}
 
         <RoofMesh
           geometry={geometry}

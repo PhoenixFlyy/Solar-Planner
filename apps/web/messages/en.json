@@ -36,6 +36,13 @@
     "useFootprint": "Use building dimensions",
     "back": "Back"
   },
+  "Sun": {
+    "time": "Time of day",
+    "spring": "Spring",
+    "summer": "Summer",
+    "autumn": "Autumn",
+    "winter": "Winter"
+  },
   "RoofTemplates": {
     "satteldach": "Gable roof",
     "pultdach": "Mono-pitch roof",

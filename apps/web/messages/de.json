@@ -36,6 +36,13 @@
     "useFootprint": "Maße aus Gebäude übernehmen",
     "back": "Zurück"
   },
+  "Sun": {
+    "time": "Uhrzeit",
+    "spring": "Frühling",
+    "summer": "Sommer",
+    "autumn": "Herbst",
+    "winter": "Winter"
+  },
   "RoofTemplates": {
     "satteldach": "Satteldach",
     "pultdach": "Pultdach",

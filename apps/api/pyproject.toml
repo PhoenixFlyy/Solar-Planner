@@ -52,7 +52,7 @@ strict = true
 plugins = ["pydantic.mypy"]
 # Heavy geospatial/PV libs ship incomplete stubs — don't fail strict on them.
 [[tool.mypy.overrides]]
-module = ["pvlib.*", "geopandas.*", "shapely.*", "pyproj.*", "hishel.*"]
+module = ["pvlib.*", "pandas.*", "geopandas.*", "shapely.*", "pyproj.*", "hishel.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

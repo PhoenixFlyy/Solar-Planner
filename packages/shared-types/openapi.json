@@ -191,6 +191,27 @@
         "title": "LatLng",
         "type": "object"
       },
+      "SunPosition": {
+        "description": "Solar position in the pvlib frame: azimuth 0=N, 90=E, 180=S, 270=W.",
+        "properties": {
+          "azimuth": {
+            "description": "Compass azimuth, degrees (0=N, 90=E, 180=S, 270=W).",
+            "title": "Azimuth",
+            "type": "number"
+          },
+          "elevation": {
+            "description": "Apparent elevation above the horizon, degrees.",
+            "title": "Elevation",
+            "type": "number"
+          }
+        },
+        "required": [
+          "azimuth",
+          "elevation"
+        ],
+        "title": "SunPosition",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -355,6 +376,72 @@
         "summary": "Health",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/v1/solar/sun-position": {
+      "get": {
+        "operationId": "sun_position_api_v1_solar_sun_position_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lat",
+            "required": true,
+            "schema": {
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Lat",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lng",
+            "required": true,
+            "schema": {
+              "maximum": 180,
+              "minimum": -180,
+              "title": "Lng",
+              "type": "number"
+            }
+          },
+          {
+            "description": "ISO 8601 instant; naive is treated as UTC.",
+            "in": "query",
+            "name": "timestamp",
+            "required": true,
+            "schema": {
+              "description": "ISO 8601 instant; naive is treated as UTC.",
+              "title": "Timestamp",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SunPosition"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sun Position",
+        "tags": [
+          "solar"
         ]
       }
     }
