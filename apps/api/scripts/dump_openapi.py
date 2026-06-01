@@ -22,7 +22,13 @@ def main() -> None:
     out = Path(sys.argv[1])
     out.parent.mkdir(parents=True, exist_ok=True)
     schema = app.openapi()
-    out.write_text(json.dumps(schema, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    # Force LF so the codegen-sync check is stable across OSes (default
+    # text-mode write would emit CRLF on Windows).
+    out.write_text(
+        json.dumps(schema, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     print(f"Wrote {out}")
 
 
