@@ -63,6 +63,17 @@ describe("layoutSurface", () => {
     expect(tri.length).toBeLessThan(rect.length);
   });
 
+  it("panelLayout_obstacle_excludesCoveredPanels", () => {
+    const surf = rectSurface(8, 6);
+    const without = layoutSurface(surf, { density: 0.7 });
+    const withObstacle = layoutSurface(surf, {
+      density: 0.7,
+      obstacles: [{ u: 4, v: 3, widthM: 2, heightM: 2 }],
+    });
+    expect(withObstacle.length).toBeLessThan(without.length);
+    expect(withObstacle.length).toBeGreaterThan(0);
+  });
+
   it("panelLayout_panelIdsAreUnique", () => {
     const placed = layoutSurface(rectSurface(8, 6), { density: 0.7 });
     expect(new Set(placed.map((p) => p.id)).size).toBe(placed.length);

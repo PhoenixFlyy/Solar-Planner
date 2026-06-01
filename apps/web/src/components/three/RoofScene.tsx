@@ -4,23 +4,29 @@ import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Grid, OrbitControls } from "@react-three/drei";
 
-import type { RoofGeometry } from "@/lib/templates";
+import type { RoofGeometry, Vec3 } from "@/lib/templates";
 import { sunDirection, type SunPosition } from "@/lib/solar/sun-position";
-import type { PanelPlacement } from "@/lib/solar/panel-layout";
+import type { Obstacle, PanelPlacement } from "@/lib/solar/panel-layout";
 import { RoofMesh } from "./RoofMesh";
 import { PanelLayer } from "./PanelLayer";
+import { ObstacleLayer } from "./ObstacleLayer";
 
 const EMPTY: Set<string> = new Set();
+const NO_OBSTACLES: Obstacle[] = [];
 
 export interface RoofSceneProps {
   geometry: RoofGeometry;
   selectedSurfaceId?: string | null;
-  onSelectSurface?: (id: string) => void;
+  onSelectSurface?: (id: string, point: Vec3) => void;
   /** Sun position for the directional light; omitted = a fixed default sun. */
   sun?: SunPosition;
   panels?: PanelPlacement[];
   removedPanels?: Set<string>;
   onTogglePanel?: (id: string) => void;
+  obstacles?: Obstacle[];
+  selectedObstacleId?: string | null;
+  onMoveObstacle?: (id: string, u: number, v: number) => void;
+  onSelectObstacle?: (id: string | null) => void;
   className?: string;
 }
 
@@ -36,6 +42,10 @@ export function RoofScene({
   panels,
   removedPanels,
   onTogglePanel,
+  obstacles,
+  selectedObstacleId,
+  onMoveObstacle,
+  onSelectObstacle,
   className,
 }: RoofSceneProps) {
   const target: [number, number, number] = [0, geometry.ridgeHeightM / 2, 0];
@@ -55,7 +65,12 @@ export function RoofScene({
       className={className ?? "h-[28rem] w-full overflow-hidden rounded-lg bg-sky-50"}
       data-testid="roof-scene"
     >
-      <Canvas shadows camera={{ position: [reach, reach * 0.9, reach], fov: 45 }} dpr={[1, 2]}>
+      <Canvas
+        shadows
+        camera={{ position: [reach, reach * 0.9, reach], fov: 45 }}
+        dpr={[1, 2]}
+        onPointerMissed={() => onSelectObstacle?.(null)}
+      >
         <ambientLight intensity={0.35 + 0.2 * daylight} />
         <directionalLight
           position={lightPos}
@@ -90,6 +105,16 @@ export function RoofScene({
             placements={panels}
             removed={removedPanels ?? EMPTY}
             onTogglePanel={onTogglePanel}
+          />
+        )}
+
+        {onMoveObstacle && onSelectObstacle && (
+          <ObstacleLayer
+            geometry={geometry}
+            obstacles={obstacles ?? NO_OBSTACLES}
+            selectedId={selectedObstacleId}
+            onMove={onMoveObstacle}
+            onSelect={onSelectObstacle}
           />
         )}
 

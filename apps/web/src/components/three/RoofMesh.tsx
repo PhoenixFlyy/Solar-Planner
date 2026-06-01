@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 
-import type { RoofGeometry } from "@/lib/templates";
+import type { RoofGeometry, Vec3 } from "@/lib/templates";
 import { polygonGeometry, wallsGeometry } from "./geometry-utils";
 
 const WALL_COLOR = "#e7e5e4"; // stone-200
@@ -13,7 +13,8 @@ const ROOF_SELECTED = "#f59e0b"; // amber-500
 export interface RoofMeshProps {
   geometry: RoofGeometry;
   selectedSurfaceId?: string | null;
-  onSelectSurface?: (id: string) => void;
+  /** Called on roof-face click with the surface id and the world hit point. */
+  onSelectSurface?: (id: string, point: Vec3) => void;
 }
 
 export function RoofMesh({ geometry, selectedSurfaceId, onSelectSurface }: RoofMeshProps) {
@@ -52,7 +53,7 @@ export function RoofMesh({ geometry, selectedSurfaceId, onSelectSurface }: RoofM
             onSelectSurface
               ? (e) => {
                   e.stopPropagation();
-                  onSelectSurface(id);
+                  onSelectSurface(id, [e.point.x, e.point.y, e.point.z]);
                 }
               : undefined
           }

@@ -9,7 +9,13 @@ import { CURRENT_PROJECT_ID, db, saveProject } from "@/lib/db/db";
 import { useRoofStore } from "@/lib/store/roof";
 import { applyDimensions, footprintDimensions, getTemplate } from "@/lib/templates";
 import { sunPosition } from "@/lib/solar/sun-position";
-import { kWpFor, layoutGeometry } from "@/lib/solar/panel-layout";
+import {
+  kWpFor,
+  layoutGeometry,
+  projectToSurfaceUV,
+  surfaceBasis,
+  type ObstacleKind,
+} from "@/lib/solar/panel-layout";
 import { Link } from "@/i18n/navigation";
 import { TemplatePicker } from "@/components/planner/TemplatePicker";
 import { RoofParamSliders } from "@/components/planner/RoofParamSliders";
@@ -41,8 +47,16 @@ export default function DachPage() {
   const removedPanelIds = useRoofStore((s) => s.removedPanelIds);
   const setPanelDensity = useRoofStore((s) => s.setPanelDensity);
   const togglePanel = useRoofStore((s) => s.togglePanel);
+  const obstacles = useRoofStore((s) => s.obstacles);
+  const selectedObstacleId = useRoofStore((s) => s.selectedObstacleId);
+  const addObstacle = useRoofStore((s) => s.addObstacle);
+  const moveObstacle = useRoofStore((s) => s.moveObstacle);
+  const removeObstacle = useRoofStore((s) => s.removeObstacle);
+  const selectObstacle = useRoofStore((s) => s.selectObstacle);
   const hydrate = useRoofStore((s) => s.hydrate);
   const toConfig = useRoofStore((s) => s.toConfig);
+
+  const [armedKind, setArmedKind] = useState<ObstacleKind | null>(null);
 
   // Hydrate the editor once from Dexie (null = loaded-but-absent).
   const stored = useLiveQuery(() => db.projects.get(CURRENT_PROJECT_ID).then((p) => p ?? null), []);
@@ -60,7 +74,7 @@ export default function DachPage() {
       const roof = toConfig();
       if (roof) void saveProject({ roof });
     }
-  }, [templateId, params, panelDensity, removedPanelIds, toConfig]);
+  }, [templateId, params, panelDensity, removedPanelIds, obstacles, toConfig]);
 
   const geometry = useMemo(
     () => (templateId && params ? getTemplate(templateId).buildGeometry(params) : null),
@@ -69,13 +83,27 @@ export default function DachPage() {
 
   const totalAreaM2 = geometry ? geometry.surfaces.reduce((a, s) => a + s.areaM2, 0) : 0;
 
-  // Auto-layout panels; count excludes manually-removed ones.
+  // Auto-layout panels; obstacles carve out area, removals trim the count.
   const placements = useMemo(
-    () => (geometry ? layoutGeometry(geometry, { density: panelDensity }) : []),
-    [geometry, panelDensity],
+    () => (geometry ? layoutGeometry(geometry, { density: panelDensity, obstacles }) : []),
+    [geometry, panelDensity, obstacles],
   );
   const panelCount = placements.filter((p) => !removedPanelIds.has(p.id)).length;
   const kWp = kWpFor(panelCount);
+
+  // Place an armed obstacle where the user clicked a roof face; else select.
+  function handleSurfaceClick(surfaceId: string, point: [number, number, number]) {
+    if (!armedKind || !geometry) {
+      selectSurface(surfaceId);
+      return;
+    }
+    const surface = geometry.surfaces.find((s) => s.id === surfaceId);
+    if (!surface) return;
+    const { u, v } = projectToSurfaceUV(surfaceBasis(surface.polygon), point);
+    const snap = (n: number) => Math.round(n / 0.5) * 0.5;
+    addObstacle(armedKind, surfaceId, snap(u), snap(v));
+    setArmedKind(null);
+  }
 
   // Sun / time-of-year for the live light + shadows.
   const [sunTime, setSunTime] = useState<SunTime>({ month: 6, day: 21, hour: 12 });
@@ -119,11 +147,15 @@ export default function DachPage() {
             <RoofScene
               geometry={geometry}
               selectedSurfaceId={selectedSurfaceId}
-              onSelectSurface={selectSurface}
+              onSelectSurface={handleSurfaceClick}
               sun={sun}
               panels={placements}
               removedPanels={removedPanelIds}
               onTogglePanel={togglePanel}
+              obstacles={obstacles}
+              selectedObstacleId={selectedObstacleId}
+              onMoveObstacle={moveObstacle}
+              onSelectObstacle={selectObstacle}
             />
             <p className="text-sm text-neutral-600">
               {t("surfaceSummary", {
@@ -131,6 +163,36 @@ export default function DachPage() {
                 area: Math.round(totalAreaM2),
               })}
             </p>
+
+            {/* Obstacle toolbar */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-neutral-500">{t("obstacles")}:</span>
+              <Button
+                size="sm"
+                variant={armedKind === "window" ? "default" : "outline"}
+                onClick={() => setArmedKind(armedKind === "window" ? null : "window")}
+              >
+                {t("window")}
+              </Button>
+              <Button
+                size="sm"
+                variant={armedKind === "chimney" ? "default" : "outline"}
+                onClick={() => setArmedKind(armedKind === "chimney" ? null : "chimney")}
+              >
+                {t("chimney")}
+              </Button>
+              {selectedObstacleId && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => removeObstacle(selectedObstacleId)}
+                >
+                  {t("removeObstacle")}
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-neutral-400">{armedKind ? t("placeHint") : t("dragHint")}</p>
+
             <SunControls value={sunTime} onChange={setSunTime} />
           </div>
 

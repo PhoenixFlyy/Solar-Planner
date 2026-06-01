@@ -38,7 +38,13 @@
     "modules": "Module",
     "kwp": "{kwp} kWp",
     "density": "Belegungsdichte",
-    "removeHint": "Modul anklicken zum Entfernen."
+    "removeHint": "Modul anklicken zum Entfernen.",
+    "obstacles": "Hindernisse",
+    "window": "Fenster",
+    "chimney": "Schornstein",
+    "removeObstacle": "Entfernen",
+    "placeHint": "Auf Dachfläche klicken zum Platzieren.",
+    "dragHint": "Hindernis ziehen zum Verschieben – die Belegung spart die Fläche aus."
   },
   "Sun": {
     "time": "Uhrzeit",

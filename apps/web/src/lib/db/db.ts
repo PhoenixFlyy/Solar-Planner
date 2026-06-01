@@ -3,6 +3,7 @@
 // models so an account sync is a straight INSERT/SELECT later.
 import Dexie, { type Table } from "dexie";
 
+import type { Obstacle } from "@/lib/solar/panel-layout";
 import type { RoofParams, RoofTemplateId } from "@/lib/templates";
 
 export interface StoredLatLng {
@@ -24,6 +25,8 @@ export interface RoofConfig {
   panelDensity?: number;
   /** Panel ids the user manually removed from the auto-layout. */
   removedPanelIds?: string[];
+  /** Roof obstacles (windows, chimneys) whose area panels avoid. */
+  obstacles?: Obstacle[];
 }
 
 export interface PlannerProject {

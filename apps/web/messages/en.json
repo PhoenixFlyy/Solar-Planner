@@ -38,7 +38,13 @@
     "modules": "Modules",
     "kwp": "{kwp} kWp",
     "density": "Packing density",
-    "removeHint": "Click a module to remove it."
+    "removeHint": "Click a module to remove it.",
+    "obstacles": "Obstacles",
+    "window": "Window",
+    "chimney": "Chimney",
+    "removeObstacle": "Remove",
+    "placeHint": "Click a roof face to place it.",
+    "dragHint": "Drag an obstacle to move it — the layout carves out its area."
   },
   "Sun": {
     "time": "Time of day",
