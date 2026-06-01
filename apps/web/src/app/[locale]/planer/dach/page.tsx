@@ -36,9 +36,10 @@ const RoofScene = dynamic(() => import("@/components/three/RoofScene").then((m) 
   loading: () => <div className="h-[28rem] w-full animate-pulse rounded-lg bg-neutral-100" />,
 });
 
-// Cesium real-world view (ADR-0008) — only used when a token is configured.
-const CesiumScene = dynamic(
-  () => import("@/components/three/CesiumScene").then((m) => m.CesiumScene),
+// Editable house embedded in the real world via Cesium (ADR-0008) — only used
+// when a token is configured.
+const CesiumEditor = dynamic(
+  () => import("@/components/three/CesiumEditor").then((m) => m.CesiumEditor),
   {
     ssr: false,
     loading: () => <div className="h-[28rem] w-full animate-pulse rounded-lg bg-sky-100" />,
@@ -71,7 +72,7 @@ export default function DachPage() {
   const toConfig = useRoofStore((s) => s.toConfig);
 
   const [armedKind, setArmedKind] = useState<ObstacleKind | null>(null);
-  const [view, setView] = useState<"editor" | "real">("editor");
+  const [view, setView] = useState<"editor" | "real">(CESIUM_TOKEN ? "real" : "editor");
 
   // Hydrate the editor once from Dexie (null = loaded-but-absent).
   const stored = useLiveQuery(() => db.projects.get(CURRENT_PROJECT_ID).then((p) => p ?? null), []);
@@ -172,11 +173,12 @@ export default function DachPage() {
 
   // Sun / time-of-year for the live light + shadows.
   const [sunTime, setSunTime] = useState<SunTime>({ month: 6, day: 21, hour: 12 });
-  const sun = useMemo(() => {
-    // Approximate CET (UTC+1); DST ignored for a schematic sun.
-    const date = new Date(Date.UTC(2025, sunTime.month - 1, sunTime.day, sunTime.hour - 1, 0));
-    return sunPosition(date, loc.lat, loc.lng);
-  }, [sunTime, loc.lat, loc.lng]);
+  // Approximate CET (UTC+1); DST ignored for a schematic sun.
+  const sunDate = useMemo(
+    () => new Date(Date.UTC(2025, sunTime.month - 1, sunTime.day, sunTime.hour - 1, 0)),
+    [sunTime],
+  );
+  const sun = useMemo(() => sunPosition(sunDate, loc.lat, loc.lng), [sunDate, loc.lat, loc.lng]);
 
   const footprintPoints = stored?.footprint?.points ?? null;
   function applyFootprint() {
@@ -230,7 +232,30 @@ export default function DachPage() {
             )}
 
             {view === "real" && CESIUM_TOKEN ? (
-              <CesiumScene lat={loc.lat} lng={loc.lng} token={CESIUM_TOKEN} />
+              <CesiumEditor
+                geometry={geometry}
+                lat={loc.lat}
+                lng={loc.lng}
+                token={CESIUM_TOKEN}
+                sunTimeUtc={sunDate}
+                panels={placements}
+                removedPanels={removedPanelIds}
+                obstacles={obstacles}
+                selectedSurfaceId={selectedSurfaceId}
+                selectedObstacleId={selectedObstacleId}
+                armed={armedKind !== null}
+                panelColorFor={panelColorFor}
+                onSelectSurface={selectSurface}
+                onTogglePanel={togglePanel}
+                onSelectObstacle={selectObstacle}
+                onPlaceObstacleAt={(surfaceId, u, v) => {
+                  if (armedKind) {
+                    addObstacle(armedKind, surfaceId, u, v);
+                    setArmedKind(null);
+                  }
+                }}
+                onMoveObstacleTo={moveObstacle}
+              />
             ) : (
               <RoofScene
                 geometry={geometry}

@@ -235,5 +235,23 @@ export function surfaceUVBounds(poly: Vec3[]): {
   };
 }
 
+/** The four world-space corners of a placed panel (for rendering as a quad). */
+export function panelCorners(p: PanelPlacement): Vec3[] {
+  const hw = PANEL.widthM / 2;
+  const hh = PANEL.heightM / 2;
+  const lift = PANEL.thicknessM / 2 + 0.02;
+  const c: Vec3 = [
+    p.center[0] + p.normal[0] * lift,
+    p.center[1] + p.normal[1] * lift,
+    p.center[2] + p.normal[2] * lift,
+  ];
+  const mix = (su: number, sv: number): Vec3 => [
+    c[0] + p.u[0] * su * hw + p.v[0] * sv * hh,
+    c[1] + p.u[1] * su * hw + p.v[1] * sv * hh,
+    c[2] + p.u[2] * su * hw + p.v[2] * sv * hh,
+  ];
+  return [mix(-1, -1), mix(1, -1), mix(1, 1), mix(-1, 1)];
+}
+
 /** Total kWp for a panel count. */
 export const kWpFor = (panelCount: number): number => (panelCount * PANEL.ratedWp) / 1000;
