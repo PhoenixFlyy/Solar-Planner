@@ -1,0 +1,40 @@
+name: codegen-sync
+
+# Fails if the committed shared-types are out of sync with the FastAPI schema.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  codegen-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install JS dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Sync Python environment
+        run: uv sync --directory apps/api
+
+      - name: Regenerate shared types
+        run: pnpm run codegen
+
+      - name: Fail if generated types drifted
+        run: |
+          if ! git diff --exit-code packages/shared-types; then
+            echo "::error::shared-types is out of date. Run 'pnpm run codegen' and commit the result."
+            exit 1
+          fi
