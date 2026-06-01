@@ -247,6 +247,10 @@ export default function WirtschaftPage() {
               </div>
 
               <p className="text-xs text-neutral-400">{t("disclaimer")}</p>
+
+              <Button asChild className="self-start">
+                <Link href="/planer/export">{t("continueToExport")}</Link>
+              </Button>
             </>
           )}
         </div>

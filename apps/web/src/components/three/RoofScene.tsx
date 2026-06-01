@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useEffect, useMemo, type RefObject } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { Grid, OrbitControls } from "@react-three/drei";
 
 import type { RoofGeometry, Vec3 } from "@/lib/templates";
@@ -13,6 +13,21 @@ import { ObstacleLayer } from "./ObstacleLayer";
 
 const EMPTY: Set<string> = new Set();
 const NO_OBSTACLES: Obstacle[] = [];
+
+/** Registers a PNG capture fn (needs Canvas gl preserveDrawingBuffer). */
+function Capturer({ captureRef }: { captureRef: RefObject<(() => string) | null> }) {
+  const { gl, scene, camera } = useThree();
+  useEffect(() => {
+    captureRef.current = () => {
+      gl.render(scene, camera);
+      return gl.domElement.toDataURL("image/png");
+    };
+    return () => {
+      captureRef.current = null;
+    };
+  }, [gl, scene, camera, captureRef]);
+  return null;
+}
 
 export interface RoofSceneProps {
   geometry: RoofGeometry;
@@ -28,6 +43,8 @@ export interface RoofSceneProps {
   selectedObstacleId?: string | null;
   onMoveObstacle?: (id: string, u: number, v: number) => void;
   onSelectObstacle?: (id: string | null) => void;
+  /** Receives a PNG-capture function once the scene is mounted. */
+  captureRef?: RefObject<(() => string) | null>;
   className?: string;
 }
 
@@ -48,6 +65,7 @@ export function RoofScene({
   selectedObstacleId,
   onMoveObstacle,
   onSelectObstacle,
+  captureRef,
   className,
 }: RoofSceneProps) {
   const target: [number, number, number] = [0, geometry.ridgeHeightM / 2, 0];
@@ -71,8 +89,10 @@ export function RoofScene({
         shadows
         camera={{ position: [reach, reach * 0.9, reach], fov: 45 }}
         dpr={[1, 2]}
+        gl={{ preserveDrawingBuffer: true }}
         onPointerMissed={() => onSelectObstacle?.(null)}
       >
+        {captureRef && <Capturer captureRef={captureRef} />}
         <ambientLight intensity={0.35 + 0.2 * daylight} />
         <directionalLight
           position={lightPos}
